@@ -1,0 +1,3 @@
+UserID|Email|Password|FullName|Phone|Address|Major|Role
+1001|aki@gmail.com|123456|Aki|0193673378|Tekun|Computer Science|student
+1002|zani@gmail.com|789000|Zani|012345678|Restu|Accounting|student

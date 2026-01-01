@@ -1,4 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%-- === 1. INSERT JAVA CODE HERE (Security Check) === --%>
+<%
+    // Check if the user is logged in
+    String userName = (String) session.getAttribute("userName");
+    String userID = (String) session.getAttribute("userID");
+
+    // If no user is found in the session, kick them back to index.jsp
+    if (userName == null || userID == null) {
+        response.sendRedirect("index.jsp");
+        return;
+    }
+%>
+
 <html>
 <head>
     <title>BookHub Dashboard</title>
@@ -23,6 +37,7 @@
             color: white;
             text-align: center;
             padding: 30px 20px;
+            position: relative; /* Added for Logout positioning */
         }
 
         .header h1 {
@@ -32,6 +47,21 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* Logout Button Style */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .logout-btn:hover { background-color: rgba(255,255,255,0.4); }
 
         .logo-placeholder { font-size: 50px; }
 
@@ -82,7 +112,6 @@
         .action-btn:hover { background-color: #9932CC; transform: scale(1.02); }
 
         /* --- 4. THE NEW "STICKY WRAPPER" --- */
-        /* This holds both the Tabs and the Search Bar */
         .sticky-wrapper {
             position: sticky;
             top: 0;
@@ -90,13 +119,13 @@
             box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* TABS (Inside the wrapper) */
+        /* TABS */
         .tab-bar {
             background-color: var(--main-purple);
             display: flex;
             width: 100%;
             padding: 0;
-            margin: 0; /* Removed margin-top to fit wrapper */
+            margin: 0;
         }
 
         .tab-button {
@@ -114,13 +143,13 @@
         }
 
         .tab-button.active {
-            background-color: var(--darker-purple); /* Changed to Darker Purple to match search bar */
+            background-color: var(--darker-purple);
             color: white;
         }
 
         .tab-button:hover { background-color: rgba(255, 255, 255, 0.2); }
 
-        /* SEARCH BAR (Inside the wrapper, below tabs) */
+        /* SEARCH BAR */
         .search-container {
             background-color: var(--darker-purple);
             padding: 15px;
@@ -181,14 +210,17 @@
 <body>
 
     <div class="header">
+        <a href="index.jsp" class="logout-btn">Logout ➜</a>
+
         <div class="logo-placeholder">📚</div>
         <h1>USM Reference Book Hub</h1>
     </div>
 
     <div class="profile-container">
         <div class="profile-info">
-            <h1>Welcome, Ali</h1>
-            <p><strong>Email:</strong> ali@student.usm.my</p>
+            <h1>Welcome, <%= userName %></h1>
+
+            <p><strong>Email:</strong> ali@student.usm.my (Placeholder)</p>
             <p><strong>Phone:</strong> 012-3456789</p>
             <p><strong>Address:</strong> Desasiswa Tekun, USM</p>
             <p><strong>Major:</strong> Computer Science</p>
