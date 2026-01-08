@@ -37,4 +37,54 @@ public class FileManager {
             e.printStackTrace();
         }
     }
+
+    // === NEW METHOD: Find a specific user by ID ===
+    public static String[] getUserByID(String targetID) {
+        List<String> lines = readAllLines("users.txt");
+
+        for (String line : lines) {
+            String[] parts = line.split("\\|");
+
+            // parts[0] is the UserID. Does it match?
+            if (parts.length > 0 && parts[0].equals(targetID)) {
+                return parts; // Found them! Return the data array.
+            }
+        }
+        return null; // User not found
+    }
+
+    // 1. RE-WRITE the entire file (Used when editing/deleting)
+    public static void saveAllUsers(List<String> lines) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(BASE_PATH + "users.txt"))) {
+            for (String line : lines) {
+                out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2. THE UPDATE LOGIC
+    public static void updateUser(String userId, String newName, String newPhone, String newAddress, String newMajor) {
+        List<String> lines = readAllLines("users.txt");
+        List<String> newLines = new ArrayList<>();
+
+        for (String line : lines) {
+            String[] parts = line.split("\\|");
+
+            // If this is the user we are looking for, UPDATE their info
+            if (parts.length >= 8 && parts[0].equals(userId)) {
+                // Keep ID, Email, Password, Role the same. Only change the rest.
+                // Format: ID|Email|Password|Name|Phone|Address|Major|Role
+                String updatedLine = parts[0] + "|" + parts[1] + "|" + parts[2] + "|" +
+                        newName + "|" + newPhone + "|" + newAddress + "|" + newMajor + "|" + parts[7];
+                newLines.add(updatedLine);
+            } else {
+                // If not the user, keep the line exactly as it was
+                newLines.add(line);
+            }
+        }
+        // Save the fresh list back to the file
+        saveAllUsers(newLines);
+    }
 }

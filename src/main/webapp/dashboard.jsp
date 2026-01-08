@@ -1,15 +1,34 @@
+<%@ page import="com.usm.bookhub.util.FileManager" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%-- === 1. INSERT JAVA CODE HERE (Security Check) === --%>
 <%
-    // Check if the user is logged in
-    String userName = (String) session.getAttribute("userName");
+    // 1. Security Check
     String userID = (String) session.getAttribute("userID");
+    String userName = (String) session.getAttribute("userName");
 
-    // If no user is found in the session, kick them back to index.jsp
     if (userName == null || userID == null) {
         response.sendRedirect("index.jsp");
         return;
+    }
+
+    // 2. Fetch Full User Details from Text File
+    String[] userDetails = FileManager.getUserByID(userID);
+
+    // Default values (prevents "null" errors if file is empty)
+    String email = "N/A";
+    String phone = "N/A";
+    String address = "N/A";
+    String major = "N/A";
+
+    // 3. Extract data if found
+    // File Format: UserID|Email|Password|FullName|Phone|Address|Major|Role
+    if (userDetails != null && userDetails.length >= 7) {
+        email = userDetails[1];
+        // userDetails[2] is password (skip)
+        // userDetails[3] is name (we already have userName)
+        phone = userDetails[4];
+        address = userDetails[5];
+        major = userDetails[6];
     }
 %>
 
@@ -75,6 +94,11 @@
             margin: 0 auto;
         }
 
+        .profile-info {
+            flex: 1;
+            text-align: left;
+        }
+
         .profile-info h1 {
             font-size: 36px;
             margin-bottom: 10px;
@@ -88,10 +112,56 @@
             line-height: 1.4;
         }
 
+        .info-row {
+            display: flex;
+                align-items: flex-start; /* Aligns text to top if it wraps */
+                margin: 8px 0;
+                font-size: 18px;
+                color: #444;
+                line-height: 1.4;
+            }
+
+        .info-label {
+            font-weight: bold;
+                min-width: 90px; /* Ensures "Address:" has a fixed width column */
+                color: #333;
+        }
+
+        .info-value {
+            flex: 1; /* Allows the text to wrap within its own column */
+        }
+
         .profile-buttons {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 10px;
+            align-items: flex-end;
+        }
+
+        /* --- QR CODE BOX --- */
+        .qr-section {
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            padding: 0 20px
+        }
+
+        .qr-box {
+            width: 160px;
+            height: 160px;
+            background-color: #f4f4f4; /* Light Grey */
+            border: 3px dashed #ccc;   /* Dashed border looks like "Empty/Upload" */
+            border-radius: 25px;       /* Rounded Corners */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #888;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05); /* Inner shadow for depth */
         }
 
         .action-btn {
@@ -189,6 +259,48 @@
 
         @keyframes fadeEffect { from {opacity: 0;} to {opacity: 1;} }
 
+        /* --- MODAL (POP-UP) STYLES --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 2000; /* Sit on top of everything */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); /* Black background with transparency */
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto; /* 10% from top, centered */
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close-btn:hover { color: black; }
+
+        /* File Input Styling */
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
     </style>
 
     <script>
@@ -205,6 +317,32 @@
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
+
+        // --- QR MODAL FUNCTIONS ---
+        function openQRModal() {
+            document.getElementById("qrModal").style.display = "block";
+        }
+
+        function closeQRModal() {
+            document.getElementById("qrModal").style.display = "none";
+        }
+
+        // Close modal if user clicks outside the box
+        window.onclick = function(event) {
+            var modal = document.getElementById("qrModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function openEditModal() {
+            document.getElementById("editModal").style.display = "block";
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").style.display = "none";
+        }
+
     </script>
 </head>
 <body>
@@ -220,15 +358,61 @@
         <div class="profile-info">
             <h1>Welcome, <%= userName %></h1>
 
-            <p><strong>Email:</strong> ali@student.usm.my (Placeholder)</p>
-            <p><strong>Phone:</strong> 012-3456789</p>
-            <p><strong>Address:</strong> Desasiswa Tekun, USM</p>
-            <p><strong>Major:</strong> Computer Science</p>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value"><%= email %></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Phone:</span>
+                <span class="info-value"><%= phone %></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Major:</span>
+                <span class="info-value"><%= major %></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Address:</span>
+                    <span class="info-value"><%= address %></span>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <%
+                // Check if a QR file exists for this user
+                // We check standard extensions: jpg, png, jpeg
+                String qrPath = null;
+                String[] exts = {".jpg", ".jpeg", ".png"};
+
+                // We need the physical path to check existence...
+                // But we need the web URL to display it.
+                // NOTE: Make sure this physical path matches your FileManager path!
+                String basePhysicalPath = "C:/Users/User/Documents/GitHub/USMReferenceBookHub/src/main/webapp/images/profiles/";
+
+                for (String ext : exts) {
+                    java.io.File checkFile = new java.io.File(basePhysicalPath + userID + ext);
+                    if (checkFile.exists()) {
+                        qrPath = "images/profiles/" + userID + ext; // Found it!
+                        break;
+                    }
+                }
+            %>
+
+            <% if (qrPath != null) { %>
+                <img src="<%= qrPath %>?t=<%= System.currentTimeMillis() %>"
+                     style="width: 160px; height: 160px; border-radius: 25px; border: 3px solid #BA55D3; object-fit: cover;">
+            <% } else { %>
+                <div class="qr-box">
+                    No QR Code 📷<br>
+                    <span style="font-size:12px; font-weight:normal;">(Please click "Update QR")</span>
+                </div>
+            <% } %>
         </div>
 
         <div class="profile-buttons">
+            <button class="action-btn" onclick="openAddBookModal()">Add Book 📕</button>
+            <button class="action-btn" onclick="openQRModal()">Update QR 📱</button>
             <button class="action-btn">Chat 💬</button>
-            <button class="action-btn">Edit Profile ✏️</button>
+            <button class="action-btn" onclick="openEditModal()">Edit Profile ✏️</button>
         </div>
     </div>
 
@@ -280,6 +464,56 @@
             </div>
         </div>
 
+    </div>
+
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeQRModal()">&times;</span>
+
+            <h2>Update QR Code 📱</h2>
+            <p>Upload a screenshot of your TNG or DuitNow QR.</p>
+            <p>Please make sure the QR has been cropped properly.</p>
+
+            <form action="updateQR" method="post" enctype="multipart/form-data">
+                <input type="file" name="qrFile" accept="image/*" required>
+                <br>
+                <button type="submit" class="action-btn">Upload Now ⬆️</button>
+            </form>
+
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+
+            <h2>Edit Profile ✏️</h2>
+
+            <form action="editProfile" method="post">
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <label>Full Name:</label><br>
+                    <input type="text" name="fullName" value="<%= userName %>" required style="width:100%; padding: 8px;">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <label>Phone:</label><br>
+                    <input type="text" name="phone" value="<%= phone %>" required style="width:100%; padding: 8px;">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <label>Major:</label><br>
+                    <input type="text" name="major" value="<%= major %>" required style="width:100%; padding: 8px;">
+                </div>
+
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <label>Address:</label><br>
+                    <textarea name="address" rows="3" required style="width:100%; padding: 8px;"><%= address %></textarea>
+                </div>
+
+                <button type="submit" class="action-btn">Save Changes 💾</button>
+            </form>
+
+        </div>
     </div>
 
 </body>
