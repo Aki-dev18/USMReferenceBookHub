@@ -20,9 +20,8 @@ import java.io.IOException;
 @WebServlet("/updateQR")
 public class UpdateQRServlet extends HttpServlet {
 
-    // 🔴 IMPORTANT: Update this path!
-    // Copy the path from your FileManager.java, but change the end to "images/profiles/"
-    private static final String UPLOAD_DIR = "C:/Users/User/Documents/GitHub/USMReferenceBookHub/src/main/webapp/images/profiles/";
+    // 🟢 REMOVED: private static final String UPLOAD_DIR = "C:/...";
+    // We will calculate this dynamically inside the method now.
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -37,35 +36,46 @@ public class UpdateQRServlet extends HttpServlet {
         }
 
         // 2. Get the File from the Form
-        Part filePart = request.getPart("qrFile"); // Matches name="qrFile" in HTML
+        Part filePart = request.getPart("qrFile");
 
         if (filePart != null && filePart.getSize() > 0) {
 
-            // 3. Determine File Extension (jpg, png, etc.)
+            // 🟢 STEP 3: Find the path dynamically
+            // Ask Tomcat: "Where is the 'images/profiles' folder on THIS computer?"
+            String uploadPath = getServletContext().getRealPath("") + File.separator + "images" + File.separator + "profiles";
+
+            // Safety: Create the directory if it doesn't exist
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            // 4. Determine File Extension (jpg, png, etc.)
             String fileName = filePart.getSubmittedFileName();
             String extension = "";
             int i = fileName.lastIndexOf('.');
             if (i > 0) {
-                extension = fileName.substring(i); // e.g., ".jpg"
+                extension = fileName.substring(i);
             }
 
-            // 4. Create the New Name (e.g., "1001.jpg")
-            // We use the UserID so one user only has ONE QR code (it overwrites old ones)
+            // 5. Create the New Name (e.g., "1001.jpg")
             String newFileName = userID + extension;
-            // === CLEANUP: Delete any old QR codes (jpg, png, jpeg) ===
+
+            // === CLEANUP: Delete any old QR codes ===
+            // We search inside our dynamic 'uploadPath' now
             String[] commonExtensions = {".jpg", ".jpeg", ".png"};
             for (String ext : commonExtensions) {
-                File oldFile = new File(UPLOAD_DIR + userID + ext);
+                File oldFile = new File(uploadPath + File.separator + userID + ext);
                 if (oldFile.exists()) {
-                    oldFile.delete(); // 🗑️ Delete the old one!
+                    oldFile.delete();
                 }
             }
 
-            // 5. Save the file to disk
-            // Note: We are saving to the SRC folder so it doesn't disappear on rebuild
-            filePart.write(UPLOAD_DIR + newFileName);
+            // 6. Save the file
+            // We write to the dynamic path
+            filePart.write(uploadPath + File.separator + newFileName);
 
-            // 6. Success!
+            // 7. Success!
             response.setContentType("text/html");
             response.getWriter().println("<script>");
             response.getWriter().println("alert('QR Code Uploaded Successfully! 📸');");

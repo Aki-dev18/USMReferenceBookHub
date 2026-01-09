@@ -1,5 +1,6 @@
 package com.usm.bookhub.util;
 
+import jakarta.servlet.ServletContext; // Make sure this is jakarta (Tomcat 10)
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,15 +8,20 @@ import java.util.Scanner;
 
 public class FileManager {
 
-    // 🔴 IMPORTANT: CHANGE THIS PATH TO YOUR LAPTOP'S PATH
-    // Right-click your "data" folder in IntelliJ -> Copy Path/Reference -> Absolute Path
-    private static final String BASE_PATH = "C:/Users/User/Documents/GitHub/USMReferenceBookHub/src/main/webapp/data/";
+    // 🟢 REMOVED: private static final String BASE_PATH...
+    // We now calculate the path dynamically inside each method.
 
-    public static List<String> readAllLines(String fileName) {
+    public static List<String> readAllLines(ServletContext context, String fileName) {
         List<String> lines = new ArrayList<>();
-        File file = new File(BASE_PATH + fileName);
 
-        if (!file.exists()) return lines;
+        // Ask Tomcat where "data/fileName" is on THIS specific computer
+        String realPath = context.getRealPath("/data/" + fileName);
+        File file = new File(realPath);
+
+        if (!file.exists()) {
+            System.out.println("File not found at: " + realPath); // Helpful for debugging
+            return lines;
+        }
 
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
@@ -28,63 +34,77 @@ public class FileManager {
         return lines;
     }
 
-    public static void writeLine(String fileName, String data) {
-        try (FileWriter fw = new FileWriter(BASE_PATH + fileName, true);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
+    public static void writeLine(ServletContext context, String fileName, String data) {
+        try {
+            String realPath = context.getRealPath("/data/" + fileName);
+
+            // "true" means append to the end of the file
+            FileWriter fw = new FileWriter(realPath, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw);
+
             out.println(data);
+
+            // Always close your streams!
+            out.close();
+            bw.close();
+            fw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // === NEW METHOD: Find a specific user by ID ===
-    public static String[] getUserByID(String targetID) {
-        List<String> lines = readAllLines("users.txt");
+    // Note: We added 'ServletContext context' to the parameters
+    public static String[] getUserByID(ServletContext context, String targetID) {
+        // Pass context to readAllLines
+        List<String> lines = readAllLines(context, "users.txt");
 
         for (String line : lines) {
             String[] parts = line.split("\\|");
 
-            // parts[0] is the UserID. Does it match?
+            // parts[0] is the UserID.
             if (parts.length > 0 && parts[0].equals(targetID)) {
-                return parts; // Found them! Return the data array.
+                return parts;
             }
         }
         return null; // User not found
     }
 
     // 1. RE-WRITE the entire file (Used when editing/deleting)
-    public static void saveAllUsers(List<String> lines) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(BASE_PATH + "users.txt"))) {
+    public static void saveAllUsers(ServletContext context, List<String> lines) {
+        try {
+            String realPath = context.getRealPath("/data/users.txt");
+            PrintWriter out = new PrintWriter(new FileWriter(realPath));
+
             for (String line : lines) {
                 out.println(line);
             }
+            out.close(); // Don't forget to close!
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     // 2. THE UPDATE LOGIC
-    public static void updateUser(String userId, String newName, String newPhone, String newAddress, String newMajor) {
-        List<String> lines = readAllLines("users.txt");
+    public static void updateUser(ServletContext context, String userId, String newName, String newPhone, String newAddress, String newMajor) {
+        // Pass context here
+        List<String> lines = readAllLines(context, "users.txt");
         List<String> newLines = new ArrayList<>();
 
         for (String line : lines) {
             String[] parts = line.split("\\|");
 
-            // If this is the user we are looking for, UPDATE their info
             if (parts.length >= 8 && parts[0].equals(userId)) {
                 // Keep ID, Email, Password, Role the same. Only change the rest.
-                // Format: ID|Email|Password|Name|Phone|Address|Major|Role
                 String updatedLine = parts[0] + "|" + parts[1] + "|" + parts[2] + "|" +
                         newName + "|" + newPhone + "|" + newAddress + "|" + newMajor + "|" + parts[7];
                 newLines.add(updatedLine);
             } else {
-                // If not the user, keep the line exactly as it was
                 newLines.add(line);
             }
         }
-        // Save the fresh list back to the file
-        saveAllUsers(newLines);
+        // Pass context to save
+        saveAllUsers(context, newLines);
     }
 }

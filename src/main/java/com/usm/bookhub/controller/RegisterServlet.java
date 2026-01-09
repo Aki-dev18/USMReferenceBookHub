@@ -24,8 +24,9 @@ public class RegisterServlet extends HttpServlet {
         String major = request.getParameter("major");
 
         // 2. Generate a new User ID automatically
-        // Logic: Read all users, find the last ID, and add +1
-        List<String> users = FileManager.readAllLines("users.txt");
+        // 🟢 FIXED: Added 'getServletContext()' so it finds the file on any laptop
+        List<String> users = FileManager.readAllLines(getServletContext(), "users.txt");
+
         int newId = 1001; // Default starting ID
 
         if (!users.isEmpty()) {
@@ -39,15 +40,15 @@ public class RegisterServlet extends HttpServlet {
             }
         }
 
-        // 3. Format the data string (Matches your users.txt header!)
+        // 3. Format the data string
         // UserID|Email|Password|FullName|Phone|Address|Major|Role
         String newUserLine = newId + "|" + email + "|" + password + "|" + fullName + "|" + phone + "|" + address + "|" + major + "|student";
 
         // 4. Save to file
-        FileManager.writeLine("users.txt", newUserLine);
+        // 🟢 FIXED: Added 'getServletContext()' here too
+        FileManager.writeLine(getServletContext(), "users.txt", newUserLine);
 
         // 5. Success! Send them back to Login
-        // We use JS to show a popup alert
         response.setContentType("text/html");
         response.getWriter().println("<script type=\"text/javascript\">");
         response.getWriter().println("alert('Account created successfully! User ID: " + newId + "');");

@@ -30,7 +30,8 @@ public class EditProfileServlet extends HttpServlet {
         String newMajor = request.getParameter("major");
 
         // 3. Update the File
-        FileManager.updateUser(userID, newName, newPhone, newAddress, newMajor);
+        // 🟢 FIXED: Added 'getServletContext()' so it finds the file correctly
+        FileManager.updateUser(getServletContext(), userID, newName, newPhone, newAddress, newMajor);
 
         // 4. Update the Session (so the "Welcome, Name" changes instantly)
         session.setAttribute("userName", newName);

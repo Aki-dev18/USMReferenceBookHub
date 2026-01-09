@@ -2,3 +2,4 @@ UserID|Email|Password|FullName|Phone|Address|Major|Role
 1000|admin@gmail.com|123456|Admin|0111111111|Lot 28, Simpang Tiga Talang, 33000 Kuala Kangsar, Perak|Computer Science|admin
 1001|aki@gmail.com|123456|Aki|0193673378|Tekun|Computer Science|student
 1002|zani@gmail.com|789000|Zani|012345678|Restu|Accounting|student
+1003|miyabi@gmail.com|123456|MIyabi|0119876543|Hollow Zero|Engineering|student

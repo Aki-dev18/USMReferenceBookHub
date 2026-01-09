@@ -20,8 +20,10 @@ public class LoginServlet extends HttpServlet {
         String emailInput = request.getParameter("email");
         String passwordInput = request.getParameter("password");
 
-        // 2. Read all users from the text file
-        List<String> lines = FileManager.readAllLines("users.txt");
+        // 🟢 STEP 2: FIXED
+        // We now pass 'getServletContext()' so FileManager knows the correct path on ANY laptop
+        List<String> lines = FileManager.readAllLines(getServletContext(), "users.txt");
+
         boolean isFound = false;
         String foundName = "";
         String foundID = "";
@@ -49,7 +51,6 @@ public class LoginServlet extends HttpServlet {
         // 4. Handle the Result
         if (isFound) {
             // SUCCESS: Create a "Session"
-            // This is like stamping their hand so they can enter the club (Dashboard)
             HttpSession session = request.getSession();
             session.setAttribute("userID", foundID);
             session.setAttribute("userName", foundName);
