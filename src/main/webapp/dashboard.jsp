@@ -314,6 +314,10 @@
             if (event.target == m1) m1.style.display = "none";
             if (event.target == m2) m2.style.display = "none";
         }
+
+        function openAddBookModal() { document.getElementById("addBookModal").style.display = "block"; }
+        function closeAddBookModal() { document.getElementById("addBookModal").style.display = "none"; }
+
     </script>
 </head>
 <body>
@@ -421,7 +425,6 @@
             <div class="inner-content">
                 <h2>📦 My Inventory</h2>
                 <p>Books you have uploaded to sell.</p>
-                <button class="action-btn" style="width: auto;">+ Add New Book</button>
             </div>
         </div>
     </div>
@@ -461,6 +464,40 @@
                     <textarea name="address" rows="3" required style="width:100%; padding: 8px;"><%= address %></textarea>
                 </div>
                 <button type="submit" class="action-btn">Save Changes 💾</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddBookModal()">&times;</span>
+            <h2>Sell a Book 📕</h2>
+            <p>Enter the details below.</p>
+
+            <form action="addBook" method="post" enctype="multipart/form-data">
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <label>Book Title:</label><br>
+                    <input type="text" name="title" placeholder="e.g. Intro to Java Programming" required style="width:100%; padding: 8px;">
+               </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <div style="flex: 1; text-align: left;">
+                        <label>Sale Price (RM):</label><br>
+                        <input type="number" name="salePrice" step="0.01" placeholder="50.00" required style="width:100%; padding: 8px;">
+                    </div>
+                    <div style="flex: 1; text-align: left;">
+                        <label>Rent Price (RM/week):</label><br>
+                        <input type="number" name="rentPrice" step="0.01" placeholder="5.00" required style="width:100%; padding: 8px;">
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <label>Book Cover Image:</label><br>
+                    <input type="file" name="bookImage" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="action-btn">List Book Now 🚀</button>
             </form>
         </div>
     </div>
