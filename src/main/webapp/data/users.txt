@@ -3,4 +3,4 @@ UserID|Email|Password|FullName|Phone|Address|Major|Role
 1001|aki@gmail.com|123456|Aki|0193673378|Tekun|Computer Science|student
 1002|zani@gmail.com|789000|Zani|012345678|Restu|Accounting|student
 1003|miyabi@gmail.com|123456|MIyabi|0119876543|Hollow Zero|Engineering|student
-1004|syedsaidsheikh@gmail.com|musangkingxll|Syed Haikal Al Aziz|010-9731652|8/F-2, Permatang Damar Laut, 11960, Bayan Lepas, Pulau Pinang|Computer Science|student
+1004|syedsaidsheikh@gmail.com|musangkingxll|Syed Haikals|010-9731652|8/F-2, Permatang Damar Laut, 11960, Bayan Lepas, Pulau Pinang|Computer Science|student
