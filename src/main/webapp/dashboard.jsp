@@ -471,7 +471,7 @@
         <div class="profile-buttons">
             <button class="action-btn" onclick="openAddBookModal()">Add Book 📕</button>
             <button class="action-btn" onclick="openQRModal()">Update QR 📱</button>
-            <button class="action-btn">Chat 💬</button>
+            <button class="action-btn" onclick="location.href='chat.jsp'">Chat 💬</button>
             <button class="action-btn" onclick="openEditModal()">Edit Profile ✏️</button>
         </div>
     </div>
