@@ -489,6 +489,60 @@
         function openAddBookModal() { document.getElementById("addBookModal").style.display = "block"; }
         function closeAddBookModal() { document.getElementById("addBookModal").style.display = "none"; }
 
+        function handleStatusChange(selectElement, bookId) {
+            const status = selectElement.value;
+            const customerIdInput = document.getElementById('customerId_' + bookId);
+
+            // Create or find a hidden input for returnDate
+            let returnDateInput = document.getElementById('returnDate_' + bookId);
+            if (!returnDateInput) {
+                returnDateInput = document.createElement('input');
+                returnDateInput.type = 'hidden';
+                returnDateInput.name = 'returnDate';
+                returnDateInput.id = 'returnDate_' + bookId;
+                document.getElementById('statusForm_' + bookId).appendChild(returnDateInput);
+            }
+
+            if (status === "Rented" || status === "Purchased") {
+                const customerId = prompt("Please enter the Customer ID for this transaction:");
+                if (customerId === null || customerId.trim() === "") {
+                    alert("Customer ID is required!");
+                    selectElement.value = "Available";
+                    return;
+                }
+                customerIdInput.value = customerId;
+
+                // NEW: Ask for Return Date ONLY if Rented
+                if (status === "Rented") {
+                    const rDate = prompt("Enter Expected Return Date (YYYY-MM-DD):", "2026-01-17");
+                    returnDateInput.value = (rDate && rDate.trim() !== "") ? rDate : "N/A";
+                } else {
+                    returnDateInput.value = "N/A";
+                }
+            }
+
+            document.getElementById('statusForm_' + bookId).submit();
+        }
+
+        function openEditBookModal(id, title, sale, rent) {
+            document.getElementById("editBookId").value = id;
+            document.getElementById("editTitle").value = title;
+            document.getElementById("editSalePrice").value = sale;
+            document.getElementById("editRentPrice").value = rent;
+            document.getElementById("editBookModal").style.display = "block";
+        }
+
+        function closeEditBookModal() {
+            document.getElementById("editBookModal").style.display = "none";
+        }
+
+        // Update your existing window.onclick to handle closing the new modal
+        const originalOnClick = window.onclick;
+        window.onclick = function(event) {
+            if (originalOnClick) originalOnClick(event);
+            var mEdit = document.getElementById("editBookModal");
+            if (event.target == mEdit) mEdit.style.display = "none";
+        }
     </script>
 </head>
 <body>
@@ -719,51 +773,93 @@
             </div>
 
         <%-- -------------------------------------INVENTORY SECTION------------------------------------------ --%>
-        <div id="Inventory" class="tab-content">
-            <div class="inventory-container">
-                <table class="modern-table">
-                    <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Selling Price</th>
-                        <th>Renting Price</th> <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <%
-                        List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
-                        if (books != null && !books.isEmpty()) {
-                            for (String[] book : books) {
-                    %>
-                    <tr>
-                        <td class="book-title"><%= book[1] %></td>
-                        <td class="book-price">RM <%= book[2] %></td> <td class="book-price" style="color: var(--darker-purple);">RM <%= book[3] %></td> <td>
-                            <span class="status-tag" style="background: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
-                                    color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
-                                <%= book[5] %>
-                            </span>
-                    </td>
-                        <td>
-                            <form action="deleteBook" method="POST" style="display:inline;">
-                                <input type="hidden" name="bookId" value="<%= book[0] %>">
-                                <button type="submit" class="btn-delete"
-                                        onclick="return confirm('Delete this book?')">
-                                    🗑️ Remove
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <%
-                        }
-                    } else {
-                    %>
-                    <tr><td colspan="5" class="empty-msg">No books found in your inventory.</td></tr>
-                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-        </div> </div> ```
+                <div id="Inventory" class="tab-content">
+                    <div class="inventory-container">
+                        <table class="modern-table">
+                            <thead>
+                            <tr>
+                                <th>Cover</th>
+                                <th>Title</th>
+                                <th>Selling Price</th>
+                                <th>Renting Price</th>
+                                <th style="text-align: center;">Status</th>
+                                <th style="text-align: center;">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <%
+                                List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
+                                if (books != null && !books.isEmpty()) {
+                                    for (String[] book : books) {
+
+                                        // --- IMAGE LOGIC START ---
+                                        String bookId = book[0];
+                                        String imagePath = "images/books/default.png";
+                                        String[] extensions = {".jpeg", ".jpg", ".png"};
+
+                                        for (String ext : extensions) {
+                                            String testPath = "/images/books/" + bookId + ext;
+                                            if (new java.io.File(application.getRealPath(testPath)).exists()) {
+                                                // Added System.currentTimeMillis() to prevent browser caching
+                                                imagePath = "images/books/" + bookId + ext + "?t=" + System.currentTimeMillis();
+                                                break;
+                                            }
+                                        }
+                            %>
+                            <tr>
+                                <td>
+                                    <img src="<%= imagePath %>" width="60" height="80"
+                                         style="border-radius: 5px; object-fit: cover; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                </td>
+                                <td class="book-title"><%= book[1] %></td>
+                                <td class="book-price">RM <%= book[2] %></td>
+                                <td class="book-price" style="color: var(--darker-purple);">RM <%= book[3] %></td>
+                                <td>
+                                    <form id="statusForm_<%= book[0] %>" action="updateStatus" method="POST" style="margin:0;">
+                                        <input type="hidden" name="bookId" value="<%= book[0] %>">
+                                        <input type="hidden" name="customerId" id="customerId_<%= book[0] %>" value="">
+
+                                        <select name="newStatus" onchange="handleStatusChange(this, '<%= book[0] %>')"
+                                                style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold;
+                                                        background-color: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
+                                                        color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
+
+                                            <option value="Available" <%= book[5].equalsIgnoreCase("Available") ? "selected" : "" %>>Available</option>
+                                            <option value="Rented" <%= book[5].equalsIgnoreCase("Rented") ? "selected" : "" %>>Rented</option>
+                                            <option value="Purchased" <%= book[5].equalsIgnoreCase("Purchased") ? "selected" : "" %>>Purchased</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td style="width: 180px;"> <div style="display: flex; gap: 5px; justify-content: flex-start; align-items: center;">
+
+                                    <button type="button" class="action-btn"
+                                            style="width: 80px; padding: 6px 0; background-color: #4a90e2; font-size: 11px; border-radius: 20px;"
+                                            onclick="openEditBookModal('<%= book[0] %>', '<%= book[1].replace("'", "\\'") %>', '<%= book[2] %>', '<%= book[3] %>')">
+                                        ✏️ EDIT
+                                    </button>
+
+                                    <form action="deleteBook" method="POST" style="margin: 0;">
+                                        <input type="hidden" name="bookId" value="<%= book[0] %>">
+                                        <button type="submit" class="action-btn"
+                                                style="width: 80px; padding: 6px 0; background-color: #ff5e62; font-size: 11px; border-radius: 20px;"
+                                                onclick="return confirm('Remove this book?')">
+                                            🗑️ REMOVE
+                                        </button>
+                                    </form>
+
+                                </div>
+                                </td>
+                            </tr>
+                            <%
+                                }
+                            } else {
+                            %>
+                            <tr><td colspan="6" class="empty-msg">No books found in your inventory.</td></tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> </div> ```
 
 
 
@@ -836,6 +932,40 @@
                 </div>
 
                 <button type="submit" class="action-btn">List Book Now 🚀</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editBookModal" class="modal">
+        <div class="modal-content" style="width: 450px;">
+            <span class="close-btn" onclick="closeEditBookModal()">&times;</span>
+            <h2>Edit Book Details 📕</h2>
+            <form action="editBook" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="bookId" id="editBookId">
+
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label>Book Title:</label>
+                    <input type="text" name="title" id="editTitle" required style="width:100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="flex: 1; text-align: left;">
+                        <label>Sale Price (RM):</label>
+                        <input type="number" name="salePrice" id="editSalePrice" step="0.01" required style="width:100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+                    <div style="flex: 1; text-align: left;">
+                        <label>Rent Price (RM):</label>
+                        <input type="number" name="rentPrice" id="editRentPrice" step="0.01" required style="width:100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label>Update Cover Image (Optional):</label><br>
+                    <input type="file" name="bookImage" accept="image/*" style="width:100%; padding: 8px; margin-top: 5px;">
+                    <small style="color: #666;">Leave empty to keep current image.</small>
+                </div>
+
+                <button type="submit" class="action-btn" style="background-color: #BA55D3; width: 100%;">SAVE CHANGES 💾</button>
             </form>
         </div>
     </div>

@@ -1,5 +1,5 @@
-RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date
-RCD001|Lalalala|1003|1000|Purchase|50.00|2023-10-01
-RCD002|2222|1003|1000|Rent|5.00|2023-10-05
-RCD003|Database Management|1004|1003|Purchase|20.00|2024-01-01
-RCD004|Cybersecurity Basics|1004|1003|Purchase|45.00|2024-01-01
+RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date|ReturnedDate
+
+
+RCD001|2222|1001|1000|Rent|1|2026-01-10|2026-01-17
+RCD002|Lalalala|10002|1000|Purchase|50|2026-01-10|N/A
