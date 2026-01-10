@@ -650,6 +650,7 @@
                         for (String line: allOrders) {
                             String[] parts = line.split("\\|");
                             if (parts.length >= 7) {
+                                String transactionID = parts[0];
                                 String orderBookTitle = parts[1];
                                 String buyerID = parts[2];
                                 String sellerID = parts[3];
@@ -663,7 +664,7 @@
 
                                     if (sellerInfo != null) sellerName = sellerInfo[3];
 
-                                    String[] displayData = {orderBookTitle, sellerName, price,date};
+                                    String[] displayData = {orderBookTitle, sellerName, price, date, transactionID};
 
                                     if (type.equalsIgnoreCase("Purchase")){
                                         myPurchases.add(displayData);
@@ -683,9 +684,10 @@
                             <% } else{
                                 for (String[] item : myPurchases) { %>
                             <div class="history-item">
-                                Purchase Date: <span class="history-date"><%= item[3] %></span>
+                                <span class="history-date">Transaction ID: <%= item[4] %></span>
+                                <span class="history-date">Purchase Date: <%= item[3] %></span>
                                 <strong><%= item[0] %></strong><br>
-                                Bought from: <%= item[1] %><br>
+                                Seller: <%= item[1] %><br>
                                 <span style="color: green; font-weight: bold;"> RM <%= item[2]%></span>
                             </div>
                             <% }
@@ -699,9 +701,9 @@
                             <% } else {
                                 for (String[] item : myRents) { %>
                             <div class="history-item">
-                                Return Date: <span class="history-date"><%= item[3] %></span>
+                                <span class="history-date">Return Date: <%= item[3] %></span>
                                 <strong><%= item[0] %></strong><br>
-                                Rented from: <%= item[1] %><br>
+                                Renter: <%= item[1] %><br>
                                 <span style="color: orange; font-weight: bold;">RM <%= item[2] %></span>
                             </div>
                             <%  }
