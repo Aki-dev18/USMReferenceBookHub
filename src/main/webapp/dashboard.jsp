@@ -1,6 +1,7 @@
 <%@ page import="com.usm.bookhub.util.FileManager" %>
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, java.util.ArrayList" %>
 
 <%
     // 1. Security Check
@@ -285,6 +286,93 @@
             box-sizing: border-box;
         }
 
+        /* Container to give some breathing room */
+        .inventory-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        /* The Table Style */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse; /* Removes the double lines */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .modern-table th {
+            background-color: #a25ccf; /* Matches your purple theme */
+            color: white;
+            padding: 12px;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .modern-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #eee;
+            color: #444;
+        }
+
+        /* Hover effect to make it feel interactive */
+        .modern-table tbody tr:hover {
+            background-color: #f9f0ff;
+        }
+
+        .book-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .book-price {
+            color: #a25ccf;
+            font-weight: 600;
+        }
+
+        /* Status Badge */
+        .status-tag {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 30px;
+            color: #888;}
+
+        .btn-delete {
+            background-color: #ff5e62;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #d4145a; /* Darker pink/red on hover */
+        }
+
+        /* Adjusting the tag color if it's "Sold" vs "Available" */
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: #e0e0e0;
+        }
+
+
     </style>
 
     <script>
@@ -421,11 +509,43 @@
             </div>
         </div>
 
-        <div id="Inventory" class="tab-content">
-            <div class="inner-content">
-                <h2>📦 My Inventory</h2>
-                <p>Books you have uploaded to sell.</p>
-            </div>
+        <div class="inventory-container">
+            <table class="modern-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th> </tr>
+                </thead>
+                <tbody>
+                <%
+                    List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
+                    if (books != null && !books.isEmpty()) {
+                        for (String[] book : books) {
+                %>
+                <tr>
+                    <td class="book-title"><%= book[1] %></td>
+                    <td class="book-price">RM <%= book[2] %></td>
+                    <td><span class="status-tag"><%= book[5] %></span></td>
+                    <td>
+                        <form action="deleteBook" method="POST" style="display:inline;">
+                            <input type="hidden" name="bookId" value="<%= book[0] %>">
+                            <button type="submit" class="btn-delete"
+                                    onclick="return confirm('Delete this book?')">
+                                🗑️ Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <%
+                    }
+                } else {
+                %>
+                <tr><td colspan="4" class="empty-msg">No books found in your inventory.</td></tr>
+                <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
 
