@@ -22,7 +22,7 @@ public class DisplayAvailableBookServlet extends HttpServlet{
     private int [] userID = {};
     private String [] status = {};
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         int count = 0;
 
@@ -43,4 +43,5 @@ public class DisplayAvailableBookServlet extends HttpServlet{
             count++;
         }
     }
+
 }
