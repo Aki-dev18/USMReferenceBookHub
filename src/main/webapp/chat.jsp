@@ -162,36 +162,44 @@
 
                 <div class="messages-box" id="msgBox">
                     <%
-                        // 🟢 LOGIC: Read messages and filter
-                        List<String> allMsgs = FileManager.readAllLines(application, "messages.txt");
+                        // 🟢 FIXED: Read file DIRECTLY from the real path (Bypassing FileManager cache)
+                        String realPath = application.getRealPath("/data/messages.txt");
+                        java.io.File file = new java.io.File(realPath);
                         boolean hasChat = false;
 
-                        for (String line : allMsgs) {
-                            String[] m = line.split("\\|");
-                            // Format: MsgID|Sender|Receiver|Text|Time
-                            if (m.length >= 5) {
-                                String sender = m[1];
-                                String receiver = m[2];
-                                String text = m[3];
-                                String time = m[4];
+                        if (file.exists()) {
+                            // Read the file fresh every time the page loads
+                            java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file));
+                            String line;
+                            while ((line = br.readLine()) != null) {
+                                String[] m = line.split("\\|");
 
-                                // CONDITION: Show message if (I sent it to Him) OR (He sent it to Me)
-                                boolean isFromMe = sender.equals(myID);
-                                boolean isToMe = receiver.equals(myID);
-                                boolean isFromHim = sender.equals(chatPartnerID);
-                                boolean isToHim = receiver.equals(chatPartnerID);
+                                // Format: MsgID|Sender|Receiver|Text|Time
+                                if (m.length >= 5) {
+                                    String sender = m[1].trim();   // .trim() removes accidental spaces
+                                    String receiver = m[2].trim();
+                                    String text = m[3];
+                                    String time = m[4];
 
-                                if ((isFromMe && isToHim) || (isFromHim && isToMe)) {
-                                    hasChat = true;
-                                    String bubbleClass = isFromMe ? "sent" : "received";
+                                    // CONDITION: Show message if it belongs to this conversation
+                                    boolean isFromMe = sender.equals(myID);
+                                    boolean isToMe = receiver.equals(myID);
+                                    boolean isFromHim = sender.equals(chatPartnerID);
+                                    boolean isToHim = receiver.equals(chatPartnerID);
+
+                                    if ((isFromMe && isToHim) || (isFromHim && isToMe)) {
+                                        hasChat = true;
+                                        String bubbleClass = isFromMe ? "sent" : "received";
                     %>
                         <div class="message <%= bubbleClass %>">
                             <%= text %>
                             <span class="timestamp"><%= time %></span>
                         </div>
                     <%
+                                    }
                                 }
                             }
+                            br.close(); // Close the reader nicely
                         }
 
                         if (!hasChat) {
