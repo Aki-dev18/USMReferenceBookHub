@@ -2,6 +2,8 @@
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List, java.util.ArrayList" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <%
     // 1. Security Check
@@ -372,29 +374,31 @@
             background: #e0e0e0;
         }
         /* Marketplace Section*/
-                ./* Grid Layout */
-                     .book-grid {
-                         display: grid;
-                         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Responsive columns */
-                         gap: 20px;
-                         padding: 20px 0;
-                     }
+                /* Container for the books */
+                .book-grid {
+                    display: grid;
+                    /* This magic line makes them side-by-side and wrap automatically */
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 20px; /* Space between the cards */
+                    padding: 20px 0;
+                }
 
-                     /* Individual Card Style */
-                     .book-card {
-                         background: white;
-                         border: 1px solid #e0e0e0;
-                         border-radius: 8px;
-                         padding: 15px;
-                         text-align: center;
-                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                         transition: transform 0.2s;
-                     }
+                /* Styling for individual cards to make them look uniform */
+                .book-card {
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    padding: 15px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    display: flex;
+                    flex-direction: column; /* Stacks image, title, price vertically inside the card */
+                    transition: transform 0.2s;
+                }
 
-                     .book-card:hover {
-                         transform: translateY(-5px); /* Lift effect on hover */
-                         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                     }
+                .book-card:hover {
+                    transform: translateY(-5px); /* Nice little lift effect on hover */
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                }
 
                      .book-title {
                          font-size: 16px;
@@ -412,37 +416,6 @@
                          font-size: 18px;
                          margin-bottom: 10px;
                      }
-
-                     .btn-buy {
-                         background-color: #007bff;
-                         color: white;
-                         border: none;
-                         padding: 8px 16px;
-                         border-radius: 4px;
-                         cursor: pointer;
-                         width: 100%;
-                     }
-
-                     .btn-rent {
-                                      background-color: #007bff;
-                                      color: white;
-                                      border: none;
-                                      padding: 8px 16px;
-                                      border-radius: 4px;
-                                      cursor: pointer;
-                                      width: 100%;
-                                  }
-
-                     .btn-buy:hover {
-                     background-color: #0056b3;
-                     }
-
-                     btn-rent:hover{
-                     background-color: #0056b3;
-                     }
-
-
-
 
     </style>
 
@@ -563,6 +536,19 @@
             <div id="Marketplace" class="tab-content" style="display: block;">
                 <div class="inner-content">
                     <h2>🛒 The Marketplace</h2>
+                    <p>
+                        <c:choose>
+                            <c:when test="${bookList == null}">
+                                The Servlet did not run (bookList is NULL). You bypassed the controller.
+                            </c:when>
+                            <c:when test="${empty bookList}">
+                                The Servlet ran, but found 0 books (bookList is EMPTY). Check books.txt path or format.
+                            </c:when>
+                            <c:otherwise>
+                                Success! Found ${bookList.size()} books.
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
                     <p>Here you will see a list of books for sale.</p>
                     <div class="book-grid">
                         <c:forEach items="${bookList}" var="book">
@@ -572,25 +558,33 @@
                                         src="${pageContext.request.contextPath}/images/books/${book.bookID}.jpg"
                                         alt="${book.title}"
                                         style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;"
-                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-
+                                        onerror="
+                                                if (this.src.endsWith('.jpg')) {
+                                                    this.src = '${pageContext.request.contextPath}/images/books/${book.bookID}.png';
+                                                }
+                                                // 2. If .png fails, try .jpeg
+                                                else if (this.src.endsWith('.png')) {
+                                                    this.src = '${pageContext.request.contextPath}/images/books/${book.bookID}.jpeg';
+                                                }
+                                                // 3. If everything fails, hide the image and show the fallback div
+                                                else {
+                                                    this.style.display='none';
+                                                    this.nextElementSibling.style.display='flex';
+                                                }"
                                     />
                                 </div>
                                 <div class="book-title" title="${book.title}">${book.title}</div>
-                                <div class="book-buyPrice">Buy: RM ${book.salePrice}</div>
-                                <div class="book-rentPrice">Rent: RM ${book.rentPrice}</div>
-                                <form action="buy" method="post">
-                                    <input type="hidden" name="bookId" value="${book.bookID}">
-                                    <button type="submit" class="btn-buy">Buy Now</button>
-                                </form>
-                                <form action="rent" method="post">
-                                     <input type="hidden" name="bookId" value="${book.bookID}">
-                                     <button type="submit" class="btn-rent">Rent Now</button>
-                                </form>
+                                <div class="book-buyPrice">
+                                    Buy: RM <fmt:formatNumber value="${book.salePrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                </div>
+                                <div class="book-rentPrice">
+                                    Rent: RM <fmt:formatNumber value="${book.rentPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                </div>
+                                <p> To rent or buy the book, please contact the user with ID: ${book.userID} </p>
                             </div>
                         </c:forEach>
                         <c:if test="${empty bookList}">
-                            <p style="grid-co;umn: 1/-1; text-align: center; color: #777;">
+                            <p style="grid-column: 1/-1; text-align: center; color: #777;">
                                 No books available at the moment.
                             </p>
                         </c:if>
