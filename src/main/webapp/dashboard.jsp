@@ -543,6 +543,60 @@
             var mEdit = document.getElementById("editBookModal");
             if (event.target == mEdit) mEdit.style.display = "none";
         }
+
+        // 🟢 UPDATED: SEARCH BOTH MARKETPLACE (CARDS) AND INVENTORY (TABLE)
+        function searchBooks() {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toUpperCase();
+
+            // --- 1. SEARCH MARKETPLACE (CARDS) ---
+            var cards = document.getElementsByClassName("book-card");
+            for (var i = 0; i < cards.length; i++) {
+                var titleElement = cards[i].getElementsByClassName("book-title")[0];
+                if (titleElement) {
+                    var txtValue = titleElement.textContent || titleElement.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        cards[i].style.display = "";
+                    } else {
+                        cards[i].style.display = "none";
+                    }
+                }
+            }
+
+            // --- 3. SEARCH HISTORY (ITEMS) ---
+            var historyItems = document.getElementsByClassName("history-item");
+            for (var k = 0; k < historyItems.length; k++) {
+                // In your code, the Title is inside the <strong> tag
+                var titleStrong = historyItems[k].getElementsByTagName("strong")[0];
+
+                if (titleStrong) {
+                    var txtValue = titleStrong.textContent || titleStrong.innerText;
+                    historyItems[k].style.display = (txtValue.toUpperCase().indexOf(filter) > -1) ? "block" : "none";
+                }
+            }
+
+            // --- 3. SEARCH INVENTORY (TABLE ROWS) ---
+            // Find the table and get all rows inside the body
+            var table = document.querySelector(".modern-table tbody");
+            if (table) {
+                var rows = table.getElementsByTagName("tr");
+
+                for (var j = 0; j < rows.length; j++) {
+                    // Look for the cell with class "book-title"
+                    var titleCell = rows[j].getElementsByClassName("book-title")[0];
+
+                    if (titleCell) {
+                        var txtValue = titleCell.textContent || titleCell.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            rows[j].style.display = "";
+                        } else {
+                            rows[j].style.display = "none";
+                        }
+                    }
+                }
+            }
+        }
+
     </script>
 </head>
 <body>
@@ -558,6 +612,11 @@
     <div class="profile-container">
         <div class="profile-info">
             <h1>Welcome, <%= userName %></h1>
+
+            <div class="info-row">
+                <span class="info-label">User ID:</span>
+                <span class="info-value"><%= userID %></span>
+            </div>
 
             <div class="info-row">
                 <span class="info-label">Email:</span>
@@ -624,7 +683,7 @@
         </div>
         <div class="search-container">
             <span>Search 🔍</span>
-            <input type="text" class="search-input" placeholder="Type book name...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Type book name..." onkeyup="searchBooks()">
         </div>
     </div>
 
@@ -678,7 +737,19 @@
                                 <div class="book-rentPrice">
                                     Rent: RM <fmt:formatNumber value="${book.rentPrice}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                                 </div>
-                                <p> To rent or buy the book, please contact the user with ID: ${book.userID} </p>
+                                <c:if test="${book.userID != sessionScope.userID}">
+                                    <button class="action-btn"
+                                            style="width: 100%; padding: 10px; margin-top: 10px; font-size: 14px;"
+                                            onclick="location.href='chat.jsp?withUser=${book.userID}'">
+                                        Chat with Seller 💬
+                                    </button>
+                                </c:if>
+
+                                <c:if test="${book.userID == sessionScope.userID}">
+                                    <div style="margin-top: 10px; padding: 10px; background: #eee; border-radius: 20px; color: #555; font-size: 14px; text-align: center;">
+                                        👤 You own this book
+                                    </div>
+                                </c:if>
                             </div>
                         </c:forEach>
                         <c:if test="${empty bookList}">

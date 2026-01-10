@@ -3,6 +3,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     // 1. GET CURRENT USER
@@ -16,51 +17,53 @@
     String chatPartnerID = request.getParameter("withUser");
     String chatPartnerName = "Unknown";
 
-    // 3. FIND WHO WE HAVE CHATTED WITH (Scan messages.txt)
+    // 3. FIND WHO WE HAVE CHATTED WITH
     Set<String> chattedUserIDs = new HashSet<>();
     List<String> msgLines = FileManager.readAllLines(application, "messages.txt");
 
     for (String line : msgLines) {
         String[] m = line.split("\\|");
-        // MsgID|Sender|Receiver|...
         if (m.length >= 3) {
             String sender = m[1];
             String receiver = m[2];
-
-            // If I sent it, add the Receiver to my contacts
             if (sender.equals(myID)) chattedUserIDs.add(receiver);
-            // If I received it, add the Sender to my contacts
             if (receiver.equals(myID)) chattedUserIDs.add(sender);
         }
     }
 
-    // 4. READ ALL USERS & FILTER THE LIST
+    // 4. READ ALL USERS & FILTER
     List<String> allUsersLines = FileManager.readAllLines(application, "users.txt");
     List<String[]> userList = new ArrayList<>();
 
     for (String line : allUsersLines) {
         String[] parts = line.split("\\|");
-        // UserID|Email|Password|FullName...
         if (parts.length >= 4) {
             String uID = parts[0];
             String uName = parts[3];
 
-            // 🛑 FIX 1: Skip the Header line
-            if (uID.equalsIgnoreCase("UserID")) continue;
+            if (uID.equalsIgnoreCase("UserID")) continue; // Skip Header
+            if (uID.equals(myID)) continue; // Skip Myself
 
-            // 🛑 FIX 2: Skip Myself
-            if (uID.equals(myID)) continue;
-
-            // 🛑 FIX 3: Add to list ONLY if:
-            //    a) We have chatted before (in chattedUserIDs set)
-            //    b) OR we are currently trying to chat with them (in URL)
             if (chattedUserIDs.contains(uID) || uID.equals(chatPartnerID)) {
                 userList.add(parts);
-
-                // Grab the name if this is our active partner
                 if (uID.equals(chatPartnerID)) {
                     chatPartnerName = uName;
                 }
+            }
+        }
+    }
+
+    // 🟢 5. FIND PARTNER'S QR CODE (New Logic)
+    String partnerQRPath = null;
+    if (chatPartnerID != null) {
+        String[] exts = {".jpg", ".jpeg", ".png"};
+        for (String ext : exts) {
+            String relativePath = "/images/profiles/" + chatPartnerID + ext;
+            String realPath = application.getRealPath(relativePath);
+            File checkFile = new File(realPath);
+            if (checkFile.exists()) {
+                partnerQRPath = "images/profiles/" + chatPartnerID + ext;
+                break;
             }
         }
     }
@@ -70,7 +73,7 @@
 <head>
     <title>Chat - USM Reference Book Hub</title>
     <style>
-        /* --- EXACT DASHBOARD VARIABLES --- */
+        /* --- EXACT VARIABLES --- */
         :root { --main-purple: #DDA0DD; --darker-purple: #BA55D3; }
 
         body {
@@ -89,8 +92,33 @@
         .back-btn { position: absolute; top: 20px; right: 20px; background-color: rgba(255,255,255,0.2); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px; }
         .back-btn:hover { background-color: rgba(255,255,255,0.4); }
 
-        /* CHAT STRIP */
-        .chat-strip { background-color: var(--darker-purple); padding: 15px 40px; color: white; font-size: 28px; font-weight: bold; display: flex; align-items: center; gap: 10px; text-transform: uppercase; }
+        /* CHAT STRIP (Updated for Button) */
+        .chat-strip {
+            background-color: var(--darker-purple);
+            padding: 15px 40px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* 🟢 Pushes items to opposite sides */
+            text-transform: uppercase;
+        }
+
+        /* QR BUTTON IN STRIP */
+        .qr-btn {
+            background-color: white;
+            color: var(--darker-purple);
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: none; /* Keep text normal */
+        }
+        .qr-btn:hover { background-color: #f0f0f0; transform: scale(1.05); }
 
         /* MAIN LAYOUT */
         .chat-container { display: flex; flex: 1; height: 100%; overflow: hidden; }
@@ -103,7 +131,6 @@
 
         /* RIGHT CHAT AREA */
         .chat-area { flex: 1; background-color: #f4f4f4; display: flex; flex-direction: column; }
-
         .messages-box { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
 
         /* MESSAGES */
@@ -120,7 +147,28 @@
 
         /* EMPTY STATE */
         .empty-state { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #888; text-align: center; padding: 20px; }
+
+        /* --- MODAL STYLES (Copied from Dashboard) --- */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white; margin: 10% auto; padding: 30px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative;
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: black; }
     </style>
+
+    <script>
+        function openPartnerQR() { document.getElementById("partnerQRModal").style.display = "block"; }
+        function closePartnerQR() { document.getElementById("partnerQRModal").style.display = "none"; }
+
+        // Close if clicking outside
+        window.onclick = function(event) {
+            var m = document.getElementById("partnerQRModal");
+            if (event.target == m) m.style.display = "none";
+        }
+    </script>
 </head>
 <body>
 
@@ -132,6 +180,10 @@
 
     <div class="chat-strip">
         <span>💬 CHAT <%= (chatPartnerID != null) ? "- " + chatPartnerName : "" %></span>
+
+        <% if (chatPartnerID != null) { %>
+            <button class="qr-btn" onclick="openPartnerQR()">View Seller QR 📱</button>
+        <% } %>
     </div>
 
     <div class="chat-container">
@@ -144,7 +196,10 @@
                     String activeClass = (uID.equals(chatPartnerID)) ? "active" : "";
             %>
                 <a href="chat.jsp?withUser=<%= uID %>" class="user-item <%= activeClass %>">
-                    <%= uName %>
+                    <div><%= uName %></div>
+                    <div style="font-size: 13px; font-weight: normal; opacity: 0.7; margin-top: 2px;">
+                        User ID: <%= uID %>
+                    </div>
                 </a>
             <% } %>
         </div>
@@ -162,26 +217,22 @@
 
                 <div class="messages-box" id="msgBox">
                     <%
-                        // 🟢 FIXED: Read file DIRECTLY from the real path (Bypassing FileManager cache)
+                        // Direct File Read
                         String realPath = application.getRealPath("/data/messages.txt");
-                        java.io.File file = new java.io.File(realPath);
+                        File file = new File(realPath);
                         boolean hasChat = false;
 
                         if (file.exists()) {
-                            // Read the file fresh every time the page loads
                             java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file));
                             String line;
                             while ((line = br.readLine()) != null) {
                                 String[] m = line.split("\\|");
-
-                                // Format: MsgID|Sender|Receiver|Text|Time
                                 if (m.length >= 5) {
-                                    String sender = m[1].trim();   // .trim() removes accidental spaces
+                                    String sender = m[1].trim();
                                     String receiver = m[2].trim();
                                     String text = m[3];
                                     String time = m[4];
 
-                                    // CONDITION: Show message if it belongs to this conversation
                                     boolean isFromMe = sender.equals(myID);
                                     boolean isToMe = receiver.equals(myID);
                                     boolean isFromHim = sender.equals(chatPartnerID);
@@ -199,9 +250,8 @@
                                     }
                                 }
                             }
-                            br.close(); // Close the reader nicely
+                            br.close();
                         }
-
                         if (!hasChat) {
                     %>
                         <p style="text-align:center; color:#ccc; margin-top:20px;">No messages yet. Say hello! 👋</p>
@@ -219,6 +269,23 @@
                     objDiv.scrollTop = objDiv.scrollHeight;
                 </script>
 
+            <% } %>
+        </div>
+    </div>
+
+    <div id="partnerQRModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closePartnerQR()">&times;</span>
+            <h2>Pay to <%= chatPartnerName %> 💸</h2>
+            <p>Scan this DuitNow/TNG QR code</p>
+
+            <% if (partnerQRPath != null) { %>
+                <img src="<%= partnerQRPath %>?t=<%= System.currentTimeMillis() %>"
+                     style="width: 250px; height: 250px; border-radius: 10px; border: 2px solid #BA55D3; object-fit: cover; margin-bottom: 20px;">
+            <% } else { %>
+                <div style="width: 250px; height: 250px; background: #eee; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                    <span style="color: #888;">User has not uploaded a QR code yet.</span>
+                </div>
             <% } %>
         </div>
     </div>

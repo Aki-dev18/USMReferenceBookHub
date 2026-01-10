@@ -1,5 +1,4 @@
 RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date|ReturnedDate
-
-
 RCD001|2222|1001|1000|Rent|1|2026-01-10|2026-01-17
-RCD002|Lalalala|10002|1000|Purchase|50|2026-01-10|N/A
+RCD002|Lalalala|1002|1000|Purchase|50|2026-01-10|N/A
+RCD003|ma|1001|1000|Rent|4|2026-01-11|2026-01-17
