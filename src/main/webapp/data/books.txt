@@ -8,3 +8,4 @@ B1006|Cybersecurity Basics|45|2|1003|Available
 B1007|kafka|1|1|1000|Available
 B1008|nami|4|4|1000|Available
 B1009|mamamia|6|7|1000|Available
+B1010|Foundations of Computer Science: Principles and Applications|100|10|1004|Available
