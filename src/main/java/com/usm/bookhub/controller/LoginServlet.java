@@ -56,7 +56,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userName", foundName);
 
             // Send to Dashboard
-            response.sendRedirect("dashboard.jsp");
+            response.sendRedirect("dashboard");
 
         } else {
             // FAILURE: Wrong email or password
