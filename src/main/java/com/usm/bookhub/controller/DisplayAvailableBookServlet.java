@@ -1,3 +1,5 @@
+// This controller is defunct
+
 package com.usm.bookhub.controller;
 
 import com.usm.bookhub.model.Book;
@@ -11,14 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet("/marketplace")
+@WebServlet("/defunct")
 public class DisplayAvailableBookServlet extends HttpServlet{
-    private String [] bookID= {};
-    private String [] title = {};
-    private double [] salePrice = {};
-    private double [] rentPrice = {};
-    private int [] userID = {};
-    private String [] status = {};
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
@@ -40,6 +36,7 @@ public class DisplayAvailableBookServlet extends HttpServlet{
             if ("Available".equalsIgnoreCase(status))
             {
                 Book book = new Book(parts[0], parts[1], Double.parseDouble(parts[2]), Double.parseDouble(parts[3]), Integer.parseInt(parts[4]), status);
+                availableBooks.add(book);
             }
         }
 
