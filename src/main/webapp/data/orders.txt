@@ -1,5 +1,0 @@
-TransactionID|BookTitle|BuyerID|SellerID|Type|Price|Date
-ORD001|Lalalala|1003|1000|Purchase|50.00|2023-10-01
-ORD002|2222|1003|1000|Rent|5.00|2023-10-05
-ORD003|Database Management|1004|1003|Purchase|20.00|2024-01-01
-ORD004|Cybersecurity Basics|1004|1003|Purchase|45.00|2024-01-01

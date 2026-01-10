@@ -449,8 +449,8 @@
             border-radius: 5px;
             font-size: 14px;
         }
-        /*To stylize the date*/
-        .history-date {
+        /*To stylize the date and transaction*/
+        .record-and-date {
             font-size: 12px;
             color: #888;
             float: right;
@@ -645,7 +645,7 @@
                         java.util.List<String[]> myPurchases = new java.util.ArrayList<>();
                         java.util.List<String[]> myRents = new java.util.ArrayList<>();
 
-                        java.util.List<String> allOrders = FileManager.readAllLines(application, "orders.txt");
+                        java.util.List<String> allOrders = FileManager.readAllLines(application, "record.txt");
 
                         for (String line: allOrders) {
                             String[] parts = line.split("\\|");
@@ -684,8 +684,10 @@
                             <% } else{
                                 for (String[] item : myPurchases) { %>
                             <div class="history-item">
-                                <span class="history-date">Transaction ID: <%= item[4] %></span>
-                                <span class="history-date">Purchase Date: <%= item[3] %></span>
+                                <div class="record-and-date" style="text-align: right;">
+                                    <span style="display: block; font-weight: bold; color: var(--darker-purple); margin-bottom: 2px;">#<%= item[4] %></span>
+                                    <span><%= item[3] %></span>
+                                </div>
                                 <strong><%= item[0] %></strong><br>
                                 Seller: <%= item[1] %><br>
                                 <span style="color: green; font-weight: bold;"> RM <%= item[2]%></span>
@@ -701,7 +703,10 @@
                             <% } else {
                                 for (String[] item : myRents) { %>
                             <div class="history-item">
-                                <span class="history-date">Return Date: <%= item[3] %></span>
+                                <div class="record-and-date" style="text-align: right;">
+                                    <span style="display: block; font-weight: bold; color: var(--darker-purple); margin-bottom: 2px;">#<%= item[4] %></span>
+                                    <span><%= item[3] %></span>
+                                </div>
                                 <strong><%= item[0] %></strong><br>
                                 Renter: <%= item[1] %><br>
                                 <span style="color: orange; font-weight: bold;">RM <%= item[2] %></span>
