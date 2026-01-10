@@ -325,7 +325,7 @@
     <div class="header">
         <a href="index.jsp" class="logout-btn">Logout ➜</a>
         <div class="logo-placeholder">📚</div>
-        <h1>USM Book Hub</h1>
+        <h1>USM Reference Book Hub</h1>
     </div>
 
     <div class="profile-container">
