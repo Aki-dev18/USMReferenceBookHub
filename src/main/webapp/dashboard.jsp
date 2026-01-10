@@ -1,6 +1,7 @@
 <%@ page import="com.usm.bookhub.util.FileManager" %>
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List, java.util.ArrayList" %>
 
 <%
     // 1. Security Check
@@ -225,45 +226,6 @@
             font-size: 16px;
         }
 
-        /*HISTORY SECTION */
-
-        .history-container {
-            display: flex;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .history-box {
-            flex: 1;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .history-box h3 {
-            border-bottom: 2px solid var(--main-purple);
-            padding-bottom: 10px;
-            margin-top: 0;
-            color: var(--darker-purple);
-        }
-
-        .history-item {
-            background: white;
-            border: 1px solid #eee;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: #888;
-            float: right;
-        }
-
         /* --- 5. CONTENT AREA --- */
         .content-area {
             text-align: center;
@@ -323,6 +285,93 @@
             width: 100%;
             box-sizing: border-box;
         }
+
+        /* Container to give some breathing room */
+        .inventory-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        /* The Table Style */
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse; /* Removes the double lines */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .modern-table th {
+            background-color: #a25ccf; /* Matches your purple theme */
+            color: white;
+            padding: 12px;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .modern-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #eee;
+            color: #444;
+        }
+
+        /* Hover effect to make it feel interactive */
+        .modern-table tbody tr:hover {
+            background-color: #f9f0ff;
+        }
+
+        .book-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .book-price {
+            color: #a25ccf;
+            font-weight: 600;
+        }
+
+        /* Status Badge */
+        .status-tag {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 30px;
+            color: #888;}
+
+        .btn-delete {
+            background-color: #ff5e62;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background-color: #d4145a; /* Darker pink/red on hover */
+        }
+
+        /* Adjusting the tag color if it's "Sold" vs "Available" */
+        .status-tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: #e0e0e0;
+        }
+
 
     </style>
 
@@ -449,86 +498,54 @@
                 </div>
             </div>
         </div>
-<%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
+
         <div id="History" class="tab-content">
             <div class="inner-content">
                 <h2>📜 Order History</h2>
                 <p>Here are your past transactions.</p>
-                <%
-                    java.util.List<String[]> myPurchases = new java.util.ArrayList<>();
-                    java.util.List<String[]> myRents = new java.util.ArrayList<>();
-
-                    java.util.List<String> allOrders = FileManager.readAllLines(application, "orders.txt");
-
-                    for (String line: allOrders) {
-                        String[] parts = line.split("\\|");
-
-                        if (parts.length >= 7) {
-                            String orderBookTitle = parts[1];
-                            String buyerID = parts[2];
-                            String sellerID = parts[3];
-                            String type = parts[4];
-                            String price = parts[5];
-                            String date = parts[6];
-
-                            if (buyerID.equals(userID)) {
-                                String sellerName = "Unknown";
-                                String []sellerInfo = FileManager.getUserByID(application, sellerID);
-                                if (sellerInfo != null) sellerName = sellerInfo[3];
-
-                                String[] displayData = {orderBookTitle, sellerName, price,date};
-
-                                if (type.equalsIgnoreCase("Purchase")){
-                                    myPurchases.add(displayData);
-                                }else if (type.equalsIgnoreCase("Rent")){
-                                    myRents.add(displayData);
-                                }
-                            }
-                        }
-                    }
-                %>
-
-                <div class="history-container">
-                    <div class="history-box">
-                        <h3> Purchase History</h3>
-                        <% if (myPurchases.isEmpty()) { %>
-                            <p style="color:#aaa; text-align:center;">No purchases yet.</p>
-                        <% } else{
-                            for (String[] item : myPurchases) { %>
-                                <div class="history-item">
-                                    <span class="history-date"><%= item[3] %></span>
-                                    <strong><%= item[0] %></strong><br>
-                                    Bought from: <%= item[1] %><br>
-                                    <span style="color: green; font-weight: bold;"> RM <%= item[2]%></span>
-                                </div>
-                        <% }
-                        } %>
-                    </div>
-
-                    <div class="history-box">
-                        <h3>⏱️ Renting History</h3>
-                        <% if (myRents.isEmpty()) { %>
-                        <p style="color:#aaa; text-align:center;">No rentals yet.</p>
-                        <% } else {
-                            for (String[] item : myRents) { %>
-                        <div class="history-item">
-                            <span class="history-date"><%= item[3] %></span>
-                            <strong><%= item[0] %></strong><br>
-                            Rented from: <%= item[1] %><br>
-                            <span style="color: orange; font-weight: bold;">RM <%= item[2] %></span>
-                        </div>
-                        <%  }
-                        } %>
-                    </div>
+                <div style="border: 2px dashed #ccc; padding: 40px; color: #aaa; height: 300px;">
+                    [ Order List Placeholder ]
                 </div>
             </div>
         </div>
-<%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
-        <div id="Inventory" class="tab-content">
-            <div class="inner-content">
-                <h2>📦 My Inventory</h2>
-                <p>Books you have uploaded to sell.</p>
-            </div>
+
+        <div class="inventory-container">
+            <table class="modern-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th> </tr>
+                </thead>
+                <tbody>
+                <%
+                    List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
+                    if (books != null && !books.isEmpty()) {
+                        for (String[] book : books) {
+                %>
+                <tr>
+                    <td class="book-title"><%= book[1] %></td>
+                    <td class="book-price">RM <%= book[2] %></td>
+                    <td><span class="status-tag"><%= book[5] %></span></td>
+                    <td>
+                        <form action="deleteBook" method="POST" style="display:inline;">
+                            <input type="hidden" name="bookId" value="<%= book[0] %>">
+                            <button type="submit" class="btn-delete"
+                                    onclick="return confirm('Delete this book?')">
+                                🗑️ Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <%
+                    }
+                } else {
+                %>
+                <tr><td colspan="4" class="empty-msg">No books found in your inventory.</td></tr>
+                <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
 
