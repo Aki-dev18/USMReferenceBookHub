@@ -372,6 +372,44 @@
             background: #e0e0e0;
         }
 
+        /*HISTORY SECTION */
+
+        .history-container {
+            display: flex;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .history-box {
+            flex: 1;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .history-box h3 {
+            border-bottom: 2px solid var(--main-purple);
+            padding-bottom: 10px;
+            margin-top: 0;
+            color: var(--darker-purple);
+        }
+
+        .history-item {
+            background: white;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #888;
+            float: right;
+        }
 
     </style>
 
@@ -499,16 +537,83 @@
             </div>
         </div>
 
+        <%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
         <div id="History" class="tab-content">
             <div class="inner-content">
                 <h2>📜 Order History</h2>
                 <p>Here are your past transactions.</p>
-                <div style="border: 2px dashed #ccc; padding: 40px; color: #aaa; height: 300px;">
-                    [ Order List Placeholder ]
+                <%
+                    java.util.List<String[]> myPurchases = new java.util.ArrayList<>();
+                    java.util.List<String[]> myRents = new java.util.ArrayList<>();
+
+                    java.util.List<String> allOrders = FileManager.readAllLines(application, "orders.txt");
+
+                    for (String line: allOrders) {
+                        String[] parts = line.split("\\|");
+
+                        if (parts.length >= 7) {
+                            String orderBookTitle = parts[1];
+                            String buyerID = parts[2];
+                            String sellerID = parts[3];
+                            String type = parts[4];
+                            String price = parts[5];
+                            String date = parts[6];
+
+                            if (buyerID.equals(userID)) {
+                                String sellerName = "Unknown";
+                                String []sellerInfo = FileManager.getUserByID(application, sellerID);
+                                if (sellerInfo != null) sellerName = sellerInfo[3];
+
+                                String[] displayData = {orderBookTitle, sellerName, price,date};
+
+                                if (type.equalsIgnoreCase("Purchase")){
+                                    myPurchases.add(displayData);
+                                }else if (type.equalsIgnoreCase("Rent")){
+                                    myRents.add(displayData);
+                                }
+                            }
+                        }
+                    }
+                %>
+
+                <div class="history-container">
+                    <div class="history-box">
+                        <h3> Purchase History</h3>
+                        <% if (myPurchases.isEmpty()) { %>
+                        <p style="color:#aaa; text-align:center;">No purchases yet.</p>
+                        <% } else{
+                            for (String[] item : myPurchases) { %>
+                        <div class="history-item">
+                            <span class="history-date"><%= item[3] %></span>
+                            <strong><%= item[0] %></strong><br>
+                            Bought from: <%= item[1] %><br>
+                            <span style="color: green; font-weight: bold;"> RM <%= item[2]%></span>
+                        </div>
+                        <% }
+                        } %>
+                    </div>
+
+                    <div class="history-box">
+                        <h3>⏱️ Renting History</h3>
+                        <% if (myRents.isEmpty()) { %>
+                        <p style="color:#aaa; text-align:center;">No rentals yet.</p>
+                        <% } else {
+                            for (String[] item : myRents) { %>
+                        <div class="history-item">
+                            <span class="history-date"><%= item[3] %></span>
+                            <strong><%= item[0] %></strong><br>
+                            Rented from: <%= item[1] %><br>
+                            <span style="color: orange; font-weight: bold;">RM <%= item[2] %></span>
+                        </div>
+                        <%  }
+                        } %>
+                    </div>
                 </div>
             </div>
         </div>
-
+        <<<<<<< HEAD
+        <%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
+        
         <div class="inventory-container">
             <table class="modern-table">
                 <thead>
