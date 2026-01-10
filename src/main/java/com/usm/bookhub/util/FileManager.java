@@ -107,4 +107,45 @@ public class FileManager {
         // Pass context to save
         saveAllUsers(context, newLines);
     }
+
+    public static List<String[]> ListAllBooksFromUser(ServletContext context, String ownerId) {
+
+        List<String> AllBookList = readAllLines(context, "books.txt");
+        List<String[]> MatchedBookList = new ArrayList<String[]>();
+
+        for (int i = 0; i < AllBookList.size(); i++) {
+           String book= AllBookList.get(i);
+           String[] parts=book.split("\\|");
+
+           if (parts[4].equals(ownerId))
+               MatchedBookList.add(parts);
+
+        }
+        return MatchedBookList;
+    }
+
+    public static void DeleteBook(ServletContext context, String bookId) {
+        String realPath = context.getRealPath("/data/books.txt");
+        List<String> AllBooks=readAllLines(context, "books.txt");
+        List<String> UpdatedListBooks = new ArrayList<String>();
+
+        for (int i = 0; i < AllBooks.size(); i++) {
+            String book= AllBooks.get(i);
+            String[] parts=book.split("\\|");
+
+            if(!parts[0].equals(bookId))
+                UpdatedListBooks.add(book);
+        }
+
+
+        try(PrintWriter pw = new PrintWriter(realPath)) {
+            for (int i = 0; i < UpdatedListBooks.size(); i++) {
+                pw.println(UpdatedListBooks.get(i));
+            }
+        }
+
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
