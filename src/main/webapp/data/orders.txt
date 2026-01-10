@@ -1,0 +1,3 @@
+RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date
+ORD001|Lalalala|1003|1000|Purchase|50.00|2023-10-01
+ORD002|2222|1003|1000|Rent|5.00|2023-10-05
