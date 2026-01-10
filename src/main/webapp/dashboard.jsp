@@ -2,7 +2,6 @@
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List, java.util.ArrayList" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
     // 1. Security Check
@@ -373,114 +372,6 @@
             background: #e0e0e0;
         }
 
-        /* Marketplace Section*/
-        ./* Grid Layout */
-             .book-grid {
-                 display: grid;
-                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Responsive columns */
-                 gap: 20px;
-                 padding: 20px 0;
-             }
-
-             /* Individual Card Style */
-             .book-card {
-                 background: white;
-                 border: 1px solid #e0e0e0;
-                 border-radius: 8px;
-                 padding: 15px;
-                 text-align: center;
-                 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                 transition: transform 0.2s;
-             }
-
-             .book-card:hover {
-                 transform: translateY(-5px); /* Lift effect on hover */
-                 box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-             }
-
-             .book-title {
-                 font-size: 16px;
-                 font-weight: bold;
-                 margin: 10px 0;
-                 color: #333;
-                 white-space: nowrap;
-                 overflow: hidden;
-                 text-overflow: ellipsis; /* Adds "..." if title is too long */
-             }
-
-             .book-price {
-                 color: #27ae60;
-                 font-weight: bold;
-                 font-size: 18px;
-                 margin-bottom: 10px;
-             }
-
-             .btn-buy {
-                 background-color: #007bff;
-                 color: white;
-                 border: none;
-                 padding: 8px 16px;
-                 border-radius: 4px;
-                 cursor: pointer;
-                 width: 100%;
-             }
-
-             .btn-rent {
-                              background-color: #007bff;
-                              color: white;
-                              border: none;
-                              padding: 8px 16px;
-                              border-radius: 4px;
-                              cursor: pointer;
-                              width: 100%;
-                          }
-
-             .btn-buy:hover {
-             background-color: #0056b3;
-             }
-
-             btn-rent:hover{
-             background-color: #0056b3;
-             }
-
-        /*HISTORY SECTION */
-
-        .history-container {
-            display: flex;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .history-box {
-            flex: 1;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .history-box h3 {
-            border-bottom: 2px solid var(--main-purple);
-            padding-bottom: 10px;
-            margin-top: 0;
-            color: var(--darker-purple);
-        }
-
-        .history-item {
-            background: white;
-            border: 1px solid #eee;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: #888;
-            float: right;
-        }
 
     </style>
 
@@ -580,7 +471,7 @@
         <div class="profile-buttons">
             <button class="action-btn" onclick="openAddBookModal()">Add Book 📕</button>
             <button class="action-btn" onclick="openQRModal()">Update QR 📱</button>
-            <button class="action-btn" onclick="location.href='chat.jsp'">Chat 💬</button>
+            <button class="action-btn">Chat 💬</button>
             <button class="action-btn" onclick="openEditModal()">Edit Profile ✏️</button>
         </div>
     </div>
@@ -602,156 +493,69 @@
             <div class="inner-content">
                 <h2>🛒 The Marketplace</h2>
                 <p>Here you will see a list of books for sale.</p>
-                <div class="book-grid">
-                    <c:forEach items="${bookList}" var="book">
-                        <div class="book-card">
-                            <div style="height: 120px; background: #f0f0f0; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                                <img
-                                    src="${pageContext.request.contextPath}/images/books/${book.bookID}.jpg"
-                                    alt="${book.title}"
-                                    style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-
-                                />
-                            </div>
-                            <div class="book-title" title="${book.title}">${book.title}</div>
-                            <div class="book-buyPrice">Buy: RM ${book.salePrice}</div>
-                            <div class="book-rentPrice">Rent: RM ${book.rentPrice}</div>
-                            <form action="buy" method="post">
-                                <input type="hidden" name="bookId" value="${book.bookID}">
-                                <button type="submit" class="btn-buy">Buy Now</button>
-                            </form>
-                            <form action="rent" method="post">
-                                 <input type="hidden" name="bookId" value="${book.bookID}">
-                                 <button type="submit" class="btn-rent">Rent Now</button>
-                            </form>
-                        </div>
-                    </c:forEach>
-                    <c:if test="${empty bookList}">
-                        <p style="grid-co;umn: 1/-1; text-align: center; color: #777;">
-                            No books available at the moment.
-                        </p>
-                    </c:if>
+                <div style="border: 2px dashed #ccc; padding: 40px; color: #aaa; height: 500px;">
+                    [ Book List Placeholder ]
                 </div>
             </div>
         </div>
 
-        <%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
         <div id="History" class="tab-content">
             <div class="inner-content">
                 <h2>📜 Order History</h2>
                 <p>Here are your past transactions.</p>
-                <%
-                    java.util.List<String[]> myPurchases = new java.util.ArrayList<>();
-                    java.util.List<String[]> myRents = new java.util.ArrayList<>();
-
-                    java.util.List<String> allOrders = FileManager.readAllLines(application, "orders.txt");
-
-                    for (String line: allOrders) {
-                        String[] parts = line.split("\\|");
-
-                        if (parts.length >= 7) {
-                            String orderBookTitle = parts[1];
-                            String buyerID = parts[2];
-                            String sellerID = parts[3];
-                            String type = parts[4];
-                            String price = parts[5];
-                            String date = parts[6];
-
-                            if (buyerID.equals(userID)) {
-                                String sellerName = "Unknown";
-                                String []sellerInfo = FileManager.getUserByID(application, sellerID);
-                                if (sellerInfo != null) sellerName = sellerInfo[3];
-
-                                String[] displayData = {orderBookTitle, sellerName, price,date};
-
-                                if (type.equalsIgnoreCase("Purchase")){
-                                    myPurchases.add(displayData);
-                                }else if (type.equalsIgnoreCase("Rent")){
-                                    myRents.add(displayData);
-                                }
-                            }
-                        }
-                    }
-                %>
-
-                <div class="history-container">
-                    <div class="history-box">
-                        <h3> Purchase History</h3>
-                        <% if (myPurchases.isEmpty()) { %>
-                        <p style="color:#aaa; text-align:center;">No purchases yet.</p>
-                        <% } else{
-                            for (String[] item : myPurchases) { %>
-                        <div class="history-item">
-                            <span class="history-date"><%= item[3] %></span>
-                            <strong><%= item[0] %></strong><br>
-                            Bought from: <%= item[1] %><br>
-                            <span style="color: green; font-weight: bold;"> RM <%= item[2]%></span>
-                        </div>
-                        <% }
-                        } %>
-                    </div>
-
-                    <div class="history-box">
-                        <h3>⏱️ Renting History</h3>
-                        <% if (myRents.isEmpty()) { %>
-                        <p style="color:#aaa; text-align:center;">No rentals yet.</p>
-                        <% } else {
-                            for (String[] item : myRents) { %>
-                        <div class="history-item">
-                            <span class="history-date"><%= item[3] %></span>
-                            <strong><%= item[0] %></strong><br>
-                            Rented from: <%= item[1] %><br>
-                            <span style="color: orange; font-weight: bold;">RM <%= item[2] %></span>
-                        </div>
-                        <%  }
-                        } %>
-                    </div>
+                <div style="border: 2px dashed #ccc; padding: 40px; color: #aaa; height: 300px;">
+                    [ Order List Placeholder ]
                 </div>
             </div>
         </div>
-        <<<<<<< HEAD
-        <%-- -------------------------------------------HISTORY SECTION--------------------------------------------------------------------- --%>
-        
-        <div class="inventory-container">
-            <table class="modern-table">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Action</th> </tr>
-                </thead>
-                <tbody>
-                <%
-                    List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
-                    if (books != null && !books.isEmpty()) {
-                        for (String[] book : books) {
-                %>
-                <tr>
-                    <td class="book-title"><%= book[1] %></td>
-                    <td class="book-price">RM <%= book[2] %></td>
-                    <td><span class="status-tag"><%= book[5] %></span></td>
-                    <td>
-                        <form action="deleteBook" method="POST" style="display:inline;">
-                            <input type="hidden" name="bookId" value="<%= book[0] %>">
-                            <button type="submit" class="btn-delete"
-                                    onclick="return confirm('Delete this book?')">
-                                🗑️ Remove
-                            </button>
-                        </form>
+
+        <div id="Inventory" class="tab-content">
+            <div class="inventory-container">
+                <table class="modern-table">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Selling Price</th>
+                        <th>Renting Price</th> <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%
+                        List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
+                        if (books != null && !books.isEmpty()) {
+                            for (String[] book : books) {
+                    %>
+                    <tr>
+                        <td class="book-title"><%= book[1] %></td>
+                        <td class="book-price">RM <%= book[2] %></td> <td class="book-price" style="color: var(--darker-purple);">RM <%= book[3] %></td> <td>
+                            <span class="status-tag" style="background: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
+                                    color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
+                                <%= book[5] %>
+                            </span>
                     </td>
-                </tr>
-                <%
-                    }
-                } else {
-                %>
-                <tr><td colspan="4" class="empty-msg">No books found in your inventory.</td></tr>
-                <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                        <td>
+                            <form action="deleteBook" method="POST" style="display:inline;">
+                                <input type="hidden" name="bookId" value="<%= book[0] %>">
+                                <button type="submit" class="btn-delete"
+                                        onclick="return confirm('Delete this book?')">
+                                    🗑️ Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    } else {
+                    %>
+                    <tr><td colspan="5" class="empty-msg">No books found in your inventory.</td></tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div> </div> ```
+
+
 
     <div id="qrModal" class="modal">
         <div class="modal-content">
