@@ -1,4 +1,13 @@
 BookID|Title|SalePrice|RentPrice|UserID|Status
-B1001|Lalalala|50|5|1000|Available
-B1002|2222|1|1|1000|Available
-B1003|3|2|2|1000|Available
+B9001|Java Programming: Complete Reference|55.00|15.00|1001|Available
+B9002|Database Systems & Design|45.00|10.00|1002|Available
+B9003|Modern Web Development|35.00|8.00|1000|Available
+B9004|Data Structures and Algorithms|65.00|18.00|1001|Available
+B9005|Operating Systems Internals|50.00|12.00|1002|Available
+B9006|Computer Networking|75.00|20.00|1000|Available
+B9007|Artificial Intelligence|90.00|25.00|1001|Available
+B9008|Discrete Mathematics|40.00|9.00|1002|Available
+B9009|Software Engineering|48.00|11.00|1000|Available
+B9010|Cyber Security Essentials|52.00|13.00|1001|Available
+B9011|Machine Learning Basics|80.00|22.00|1002|Available
+B9012|Cloud Computing with AWS|58.00|14.00|1000|Available
