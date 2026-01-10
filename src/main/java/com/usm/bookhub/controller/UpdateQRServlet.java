@@ -79,7 +79,7 @@ public class UpdateQRServlet extends HttpServlet {
             response.setContentType("text/html");
             response.getWriter().println("<script>");
             response.getWriter().println("alert('QR Code Uploaded Successfully! 📸');");
-            response.getWriter().println("location='dashboard.jsp';");
+            response.getWriter().println("location='dashboard';");
             response.getWriter().println("</script>");
 
         } else {

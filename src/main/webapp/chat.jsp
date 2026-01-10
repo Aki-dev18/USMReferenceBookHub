@@ -125,7 +125,7 @@
 <body>
 
     <div class="header">
-        <a href="dashboard.jsp" class="back-btn">Back to Dashboard ➜</a>
+        <a href="dashboard" class="back-btn">Back to Dashboard ➜</a>
         <div class="logo-placeholder">📚</div>
         <h1>USM Reference Book Hub</h1>
     </div>

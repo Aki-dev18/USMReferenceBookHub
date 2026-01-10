@@ -13,11 +13,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-// 1. Required for File Uploads (Images)
+// 1. INCREASED LIMITS (50MB)
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
-        maxFileSize = 1024 * 1024 * 10,      // 10 MB
-        maxRequestSize = 1024 * 1024 * 15    // 15 MB
+        fileSizeThreshold = 1024 * 1024 * 2,  // 2 MB
+        maxFileSize = 1024 * 1024 * 50,       // 50 MB (Big enough for phone photos)
+        maxRequestSize = 1024 * 1024 * 100    // 100 MB
 )
 @WebServlet("/addBook")
 public class AddBookServlet extends HttpServlet {
@@ -25,7 +25,7 @@ public class AddBookServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Security: Who is adding this book?
+        // 1. Security Check
         HttpSession session = request.getSession();
         String userID = (String) session.getAttribute("userID");
 
@@ -34,66 +34,79 @@ public class AddBookServlet extends HttpServlet {
             return;
         }
 
-        // 2. Get Form Data
-        String title = request.getParameter("title");
-        String salePrice = request.getParameter("salePrice");
-        String rentPrice = request.getParameter("rentPrice");
+        try {
+            // 2. Get Form Data
+            String title = request.getParameter("title");
+            String salePrice = request.getParameter("salePrice");
+            String rentPrice = request.getParameter("rentPrice");
 
-        // 3. Generate New Book ID (e.g., "B1001")
-        // We use 'getServletContext()' to read the file safely
-        List<String> books = FileManager.readAllLines(getServletContext(), "books.txt");
-        int nextIdNum = 1001; // Default start
+            // 3. ROBUST ID GENERATION (Fixes the crash)
+            List<String> books = FileManager.readAllLines(getServletContext(), "books.txt");
+            int nextIdNum = 1001;
 
-        if (!books.isEmpty()) {
-            try {
-                // Get the last line -> split -> get ID (e.g., "B1005") -> remove 'B' -> parse int
-                String lastLine = books.get(books.size() - 1);
-                String lastIdStr = lastLine.split("\\|")[0]; // "B1005"
-                String numberPart = lastIdStr.substring(1);   // "1005"
-                nextIdNum = Integer.parseInt(numberPart) + 1;
-            } catch (Exception e) {
-                // If ID format is weird, just keep 1001
+            for (String line : books) {
+                // Ignore empty lines or header
+                if (line.trim().isEmpty() || line.startsWith("BookID")) continue;
+
+                try {
+                    String[] parts = line.split("\\|");
+                    String idStr = parts[0]; // e.g., "B1005"
+
+                    if (idStr.startsWith("B")) {
+                        int num = Integer.parseInt(idStr.substring(1)); // 1005
+                        if (num >= nextIdNum) {
+                            nextIdNum = num + 1;
+                        }
+                    }
+                } catch (Exception ignored) {
+                    // Skip bad lines without crashing
+                }
             }
+            String newBookID = "B" + nextIdNum;
+
+            // 4. Handle Image Upload
+            Part filePart = request.getPart("bookImage");
+            String fileName = "default.jpg";
+
+            if (filePart != null && filePart.getSize() > 0) {
+                String submittedName = filePart.getSubmittedFileName();
+                String extension = ".jpg";
+                if (submittedName.contains(".")) {
+                    extension = submittedName.substring(submittedName.lastIndexOf('.'));
+                }
+
+                fileName = newBookID + extension;
+
+                // Dynamic Path
+                String appPath = getServletContext().getRealPath("");
+                // Safety check for path
+                if (appPath == null) appPath = System.getProperty("java.io.tmpdir");
+
+                String uploadPath = appPath + File.separator + "images" + File.separator + "books";
+
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdirs();
+
+                filePart.write(uploadPath + File.separator + fileName);
+            }
+
+            // 5. Save Data
+            String newBookLine = newBookID + "|" + title + "|" + salePrice + "|" + rentPrice + "|" + userID + "|Available";
+            FileManager.writeLine(getServletContext(), "books.txt", newBookLine);
+
+        // 6. Success Redirect (Hard Redirect)
+        // This forces the browser to leave the white page immediately.
+            response.sendRedirect("dashboard?tab=Inventory&status=success");
+
+        } catch (Exception e) {
+            // 🟢 ERROR TRAP: If anything crashes, print it and tell the user
+            e.printStackTrace(); // Look at your server console for this!
+
+            response.setContentType("text/html");
+            response.getWriter().println("<script>");
+            response.getWriter().println("alert('Error adding book: " + e.getMessage().replace("'", "") + "');");
+            response.getWriter().println("location='dashboard.jsp';");
+            response.getWriter().println("</script>");
         }
-        String newBookID = "B" + nextIdNum;
-
-        // 4. Handle Image Upload
-        Part filePart = request.getPart("bookImage");
-        String fileName = "default.jpg"; // Fallback
-
-        if (filePart != null && filePart.getSize() > 0) {
-            // Determine extension (jpg/png)
-            String submittedName = filePart.getSubmittedFileName();
-            String extension = ".jpg";
-            int i = submittedName.lastIndexOf('.');
-            if (i > 0) extension = submittedName.substring(i);
-
-            // SAVE IMAGE: Use the BookID as the name (e.g., "B1001.jpg")
-            fileName = newBookID + extension;
-
-            // Dynamic Path: images/books/
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "images" + File.separator + "books";
-
-            // Create folder if missing
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
-
-            // Write File
-            filePart.write(uploadPath + File.separator + fileName);
-        }
-
-        // 5. Save Data to Text File
-        // Format: BookID|Title|SalePrice|RentPrice|UserID|Status
-        String newBookLine = newBookID + "|" + title + "|" + salePrice + "|" + rentPrice + "|" + userID + "|Available";
-
-        FileManager.writeLine(getServletContext(), "books.txt", newBookLine);
-
-        // 6. Success! Redirect to Inventory tab
-        response.setContentType("text/html");
-        response.getWriter().println("<script>");
-        response.getWriter().println("alert('Book Listed Successfully! ID: " + newBookID + "');");
-        // We add a query param '?tab=Inventory' so we can use JS later to open the right tab automatically
-        response.getWriter().println("location='dashboard.jsp?tab=Inventory';");
-        response.getWriter().println("</script>");
     }
 }
