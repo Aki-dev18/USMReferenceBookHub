@@ -509,46 +509,54 @@
             </div>
         </div>
 
-        <div class="inventory-container">
-            <table class="modern-table">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Action</th> </tr>
-                </thead>
-                <tbody>
-                <%
-                    List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
-                    if (books != null && !books.isEmpty()) {
-                        for (String[] book : books) {
-                %>
-                <tr>
-                    <td class="book-title"><%= book[1] %></td>
-                    <td class="book-price">RM <%= book[2] %></td>
-                    <td><span class="status-tag"><%= book[5] %></span></td>
-                    <td>
-                        <form action="deleteBook" method="POST" style="display:inline;">
-                            <input type="hidden" name="bookId" value="<%= book[0] %>">
-                            <button type="submit" class="btn-delete"
-                                    onclick="return confirm('Delete this book?')">
-                                🗑️ Remove
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                <%
-                    }
-                } else {
-                %>
-                <tr><td colspan="4" class="empty-msg">No books found in your inventory.</td></tr>
-                <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
+        <div id="Inventory" class="tab-content">
+            <div class="inventory-container">
+                <table class="modern-table">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Selling Price</th>
+                        <th>Renting Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%
+                        List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
+                        if (books != null && !books.isEmpty()) {
+                            for (String[] book : books) {
+                    %>
+                    <tr>
+                        <td class="book-title"><%= book[1] %></td>
+                        <td class="book-price">RM <%= book[2] %></td>
+                        <td class="book-price" style="color: #BA55D3;">RM <%= book[3] %></td>
+                        <td>
+                        <span class="status-tag" style="background: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
+                                color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
+                            <%= book[5] %>
+                        </span>
+                        </td>
+                        <td>
+                            <form action="deleteBook" method="POST" style="display:inline;">
+                                <input type="hidden" name="bookId" value="<%= book[0] %>">
+                                <button type="submit" class="btn-delete"
+                                        onclick="return confirm('Delete this book?')">
+                                    🗑️ Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <%
+                        }
+                    } else {
+                    %>
+                    <tr><td colspan="5" class="empty-msg">No books found in your inventory.</td></tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div> </div>
     <div id="qrModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeQRModal()">&times;</span>
