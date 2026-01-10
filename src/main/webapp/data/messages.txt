@@ -1,1 +1,10 @@
 MsgID|SenderID|ReceiverID|MessageText|Timestamp
+M1001|1001|1002|Hi Zani, is your Accounting book still available?|2026-01-10 09:00:00
+M1002|1002|1001|Yes Aki, it is still available.|2026-01-10 09:05:00
+M1003|1001|1002|Great! Can I rent it for next week?|2026-01-10 09:06:00
+M1004|1002|1001|Sure, the rent price is RM5.|2026-01-10 09:10:00
+M1005|1003|1001|Hello Aki, do you have the notes for CS?|2026-01-10 10:00:00
+M1006|1001|1002|That's very cheap!|2026-01-10 12:45:55
+M1007|1002|1001|Then let's set a meet up date.|2026-01-10 12:53:20
+M1008|1001|1002|How about Friday next week?|2026-01-10 12:54:26
+M1009|1002|1001|Yup sounds good|2026-01-10 12:55:12

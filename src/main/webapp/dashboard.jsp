@@ -516,8 +516,7 @@
                     <tr>
                         <th>Title</th>
                         <th>Selling Price</th>
-                        <th>Renting Price</th>
-                        <th>Status</th>
+                        <th>Renting Price</th> <th>Status</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -529,14 +528,12 @@
                     %>
                     <tr>
                         <td class="book-title"><%= book[1] %></td>
-                        <td class="book-price">RM <%= book[2] %></td>
-                        <td class="book-price" style="color: #BA55D3;">RM <%= book[3] %></td>
-                        <td>
-                        <span class="status-tag" style="background: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
-                                color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
-                            <%= book[5] %>
-                        </span>
-                        </td>
+                        <td class="book-price">RM <%= book[2] %></td> <td class="book-price" style="color: var(--darker-purple);">RM <%= book[3] %></td> <td>
+                            <span class="status-tag" style="background: <%= book[5].equalsIgnoreCase("Available") ? "#d4edda" : "#f8d7da" %>;
+                                    color: <%= book[5].equalsIgnoreCase("Available") ? "#155724" : "#721c24" %>;">
+                                <%= book[5] %>
+                            </span>
+                    </td>
                         <td>
                             <form action="deleteBook" method="POST" style="display:inline;">
                                 <input type="hidden" name="bookId" value="<%= book[0] %>">
@@ -556,7 +553,10 @@
                     </tbody>
                 </table>
             </div>
-        </div> </div>
+        </div> </div> ```
+
+
+
     <div id="qrModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeQRModal()">&times;</span>
