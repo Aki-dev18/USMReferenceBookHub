@@ -2,6 +2,7 @@
 <%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List, java.util.ArrayList" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
     // 1. Security Check
@@ -372,6 +373,76 @@
             background: #e0e0e0;
         }
 
+        /* Marketplace Section*/
+        ./* Grid Layout */
+             .book-grid {
+                 display: grid;
+                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Responsive columns */
+                 gap: 20px;
+                 padding: 20px 0;
+             }
+
+             /* Individual Card Style */
+             .book-card {
+                 background: white;
+                 border: 1px solid #e0e0e0;
+                 border-radius: 8px;
+                 padding: 15px;
+                 text-align: center;
+                 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                 transition: transform 0.2s;
+             }
+
+             .book-card:hover {
+                 transform: translateY(-5px); /* Lift effect on hover */
+                 box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+             }
+
+             .book-title {
+                 font-size: 16px;
+                 font-weight: bold;
+                 margin: 10px 0;
+                 color: #333;
+                 white-space: nowrap;
+                 overflow: hidden;
+                 text-overflow: ellipsis; /* Adds "..." if title is too long */
+             }
+
+             .book-price {
+                 color: #27ae60;
+                 font-weight: bold;
+                 font-size: 18px;
+                 margin-bottom: 10px;
+             }
+
+             .btn-buy {
+                 background-color: #007bff;
+                 color: white;
+                 border: none;
+                 padding: 8px 16px;
+                 border-radius: 4px;
+                 cursor: pointer;
+                 width: 100%;
+             }
+
+             .btn-rent {
+                              background-color: #007bff;
+                              color: white;
+                              border: none;
+                              padding: 8px 16px;
+                              border-radius: 4px;
+                              cursor: pointer;
+                              width: 100%;
+                          }
+
+             .btn-buy:hover {
+             background-color: #0056b3;
+             }
+
+             btn-rent:hover{
+             background-color: #0056b3;
+             }
+
         /*HISTORY SECTION */
 
         .history-container {
@@ -531,8 +602,36 @@
             <div class="inner-content">
                 <h2>🛒 The Marketplace</h2>
                 <p>Here you will see a list of books for sale.</p>
-                <div style="border: 2px dashed #ccc; padding: 40px; color: #aaa; height: 500px;">
-                    [ Book List Placeholder ]
+                <div class="book-grid">
+                    <c:forEach items="${bookList}" var="book">
+                        <div class="book-card">
+                            <div style="height: 120px; background: #f0f0f0; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                                <img
+                                    src="${pageContext.request.contextPath}/images/books/${book.bookID}.jpg"
+                                    alt="${book.title}"
+                                    style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+
+                                />
+                            </div>
+                            <div class="book-title" title="${book.title}">${book.title}</div>
+                            <div class="book-buyPrice">Buy: RM ${book.salePrice}</div>
+                            <div class="book-rentPrice">Rent: RM ${book.rentPrice}</div>
+                            <form action="buy" method="post">
+                                <input type="hidden" name="bookId" value="${book.bookID}">
+                                <button type="submit" class="btn-buy">Buy Now</button>
+                            </form>
+                            <form action="rent" method="post">
+                                 <input type="hidden" name="bookId" value="${book.bookID}">
+                                 <button type="submit" class="btn-rent">Rent Now</button>
+                            </form>
+                        </div>
+                    </c:forEach>
+                    <c:if test="${empty bookList}">
+                        <p style="grid-co;umn: 1/-1; text-align: center; color: #777;">
+                            No books available at the moment.
+                        </p>
+                    </c:if>
                 </div>
             </div>
         </div>
