@@ -1,5 +1,5 @@
 BookID|Title|SalePrice|RentPrice|UserID|Status
-B1001|Lalalat|40|23|1000|Available
+B1001|Lalalat|40|23|1000|Rented
 B1002|2222|1|1|1000|Rented
 B1003|3|2|2|1000|Available
 B1004|ma|4|4|1000|Available

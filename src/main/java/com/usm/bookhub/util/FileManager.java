@@ -25,7 +25,8 @@ public class FileManager {
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
-                if (!line.isEmpty()) lines.add(line);
+                if (!line.isEmpty())
+                    lines.add(line);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -128,7 +129,7 @@ public class FileManager {
             String[] parts=book.split("\\|");
 
             if (parts[4].equals(ownerId))
-                MatchedBookList.add(parts);
+                MatchedBookList.add(parts); // add the book to the list if the id is matched
 
         }
         return MatchedBookList;
@@ -144,7 +145,7 @@ public class FileManager {
             String book= AllBooks.get(i);
             String[] parts=book.split("\\|");
 
-            //skipping the book we want to delete so it doesnt get saved
+            //skipping the book we want to delete so it does not get saved
             if(!parts[0].equals(bookId))
                 UpdatedListBooks.add(book);
         }
@@ -167,20 +168,25 @@ public class FileManager {
                 parts[3] = newRentPrice;
                 book = String.join("|", parts);
             }
+
             UpdatedListBooks.add(book);
         }
         RewriteFile(context, "books.txt", UpdatedListBooks);
     }
 
-    //method for deleting the old image so it doesnt clash with the new one
+    //method for deleting the old image so it does not clash with the new one
     public static void deleteOldImages(ServletContext context, String bookId) {
         String folderPath = context.getRealPath("/images/books/");
         String[] extensions = {".jpeg", ".jpg", ".png"};
 
-        for (String ext : extensions) {
+        for (int i = 0; i < extensions.length; i++) {
+
+            String ext = extensions[i];
+
             File file = new File(folderPath + File.separator + bookId + ext);
+
             if (file.exists()) {
-                file.delete();
+                file.delete(); // removes the file if found
             }
         }
     }
@@ -202,8 +208,22 @@ public class FileManager {
                 if (newStatus.equalsIgnoreCase("Rented") || newStatus.equalsIgnoreCase("Purchased")) {
                     String title = parts[1];
                     String seller = parts[4];
-                    String price = newStatus.equalsIgnoreCase("Rented") ? parts[3] : parts[2];
-                    String type = newStatus.equalsIgnoreCase("Purchased") ? "Purchase" : "Rent";
+
+                    String price;
+                    if (newStatus.equalsIgnoreCase("Rented")) {
+                        price = parts[3]; // use renting Price
+                    }
+
+                    else {
+                        price = parts[2]; // use selling Price
+                    }
+
+                    String type;
+                    if (newStatus.equalsIgnoreCase("Purchased")) {
+                        type = "Purchase"; // set transaction type to Purchase
+                    } else {
+                        type = "Rent"; // set transaction type to Rent
+                    }
 
                     addTransactionRecord(context, title, customerId, seller, type, price, returnDate);
                 }
@@ -219,9 +239,9 @@ public class FileManager {
         String recordID = String.format("RCD%03d", allRecords.size());
         String date = java.time.LocalDate.now().toString();
 
-        //putting all the info together in one string
+        //putting all the info together in one format
         String recordLine = recordID + "|" + title + "|" + buyer + "|" + seller + "|" + type + "|" + price + "|" + date + "|" + returnDate;
 
-        writeLine(context, "record.txt", recordLine);
+        writeLine(context, "record.txt", recordLine); // append the file by writing a new line
     }
 }
