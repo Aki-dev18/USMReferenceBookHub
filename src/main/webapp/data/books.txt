@@ -1,11 +1,13 @@
 BookID|Title|SalePrice|RentPrice|UserID|Status
-B1001|Lalalat|40|23|1000|Rented
-B1002|2222|1|1|1000|Rented
-B1003|3|2|2|1000|Available
-B1004|ma|4|4|1000|Available
-B1005|Database Management|20|1|1003|Available
-B1006|Cybersecurity Basics|45|2|1003|Available
-B1007|kafka|1|1|1000|Available
-B1008|nami|4|4|1000|Available
-B1009|mamamia|6|7|1000|Available
-B1010|Foundations of Computer Science: Principles and Applications|100|10|1004|Available
+B1001|Research Methodology for Health Sciences: A Quick Reference Guide|55.00|15.00|1002|Available
+B1002|University Teaching: A Reference for Graduate Students and Faculty, Second Edition |60.00|10.00|1001|Available
+B1003|Academic Writing: Mastering Citation and Referencing|40.00|12.00|1004|Available
+B1004|Everyday Mathematics: My Reference Book/Grades 1 & 2 by University of Chicago Press|85.00|20.00|1008|Available
+B1005|All my books in foreign tongues' – The Oriental Bequest of Joseph Scaliger and the University Library of Leiden|55.00|10.00|1003|Rented
+B1006|The Digital University: Reinventing the Academy|70.00|18.00|1006|Available
+B1007|Advanced Problems in Mathematics: Preparing for University|95.00|25.00|1001|Available
+B1008|The Math You Need|45.00|10.00|1009|Available
+B1009|Computer Science Education: Perspectives on Teaching and Learning in School|35.00|8.00|1005|Available
+B1010|Cambridge Global English Learner's Book 5 with Digital Access (1 Year) - Jane Boylan|75.00|15.00|1007|Available
+B1011|Cambridge Lower Secondary English Learner's Book 8 with Digital Access (1 Year)|0.00|0.00|1000|Available
+B1012|Art Subjects by Howard Singerman|50.00|12.00|1002|Rented

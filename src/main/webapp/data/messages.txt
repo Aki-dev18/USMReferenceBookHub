@@ -1,12 +1,20 @@
 MsgID|SenderID|ReceiverID|MessageText|Timestamp
-M1001|1001|1002|Hi Zani, is your Accounting book still available?|2026-01-10 09:00:00
-M1002|1002|1001|Yes Aki, it is still available.|2026-01-10 09:05:00
-M1003|1001|1002|Great! Can I rent it for next week?|2026-01-10 09:06:00
-M1004|1002|1001|Sure, the rent price is RM5.|2026-01-10 09:10:00
-M1005|1003|1001|Hello Aki, do you have the notes for CS?|2026-01-10 10:00:00
-M1006|1001|1002|That's very cheap!|2026-01-10 12:45:55
-M1007|1002|1001|Then let's set a meet up date.|2026-01-10 12:53:20
-M1008|1001|1002|How about Friday next week?|2026-01-10 12:54:26
-M1009|1002|1001|Yup sounds good|2026-01-10 12:55:12
-M1010|1000|1004|yow bro is the book available?|2026-01-11 10:12:03
-M1011|1004|1000|yeah yeah its with me|2026-01-11 10:12:58
+M1001|1001|1002|Hi Sarah, is 'Research Methodology for Health Sciences' still available?|2026-01-10 09:00:00
+M1002|1002|1001|Hey Aki! Yes, it is available.|2026-01-10 09:05:00
+M1003|1001|1002|Great! Is it for sale or rent?|2026-01-10 09:06:00
+M1004|1002|1001|I can rent it to you for RM15. It's a great guide.|2026-01-10 09:10:00
+M1005|1003|1001|Yo Aki, do you have 'Advanced Problems in Mathematics'?|2026-01-10 10:00:00
+M1006|1001|1002|That price works for me.|2026-01-10 12:45:55
+M1007|1002|1001|Cool. Let's meet up to pass the book.|2026-01-10 12:53:20
+M1008|1001|1002|How about this Friday at Restu Cafe?|2026-01-10 12:54:26
+M1009|1002|1001|Yup, Friday 2pm sounds good.|2026-01-10 12:55:12
+M1010|1001|1003|Hey John, yeah I have it. Preparing for university math?|2026-01-10 13:00:00
+M1011|1003|1001|Yes! I need it for my calculus prep.|2026-01-10 13:05:00
+M1012|1004|1005|Hi Miyabi, I saw you looking for 'Academic Writing'.|2026-01-11 10:12:03
+M1013|1005|1004|Hi Syed, yes! The one about citation and referencing?|2026-01-11 10:12:58
+M1014|1004|1005|That's the one. Selling for RM40.|2026-01-11 10:15:00
+M1015|1006|1008|Hi Jessica, is 'Everyday Mathematics' suitable for Grade 2?|2026-01-11 11:20:00
+M1016|1008|1006|Hi Lynae! Yes, it covers Grades 1 & 2.|2026-01-11 11:25:00
+M1017|1001|1004|Syed, are you free later? Need to discuss the project.|2026-01-11 14:00:00
+M1018|1004|1001|I am at the library now, come through.|2026-01-11 14:05:00
+

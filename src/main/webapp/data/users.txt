@@ -1,7 +1,11 @@
 UserID|Email|Password|FullName|Phone|Address|Major|Role
-1000|admin@gmail.com|123456|Admin|1111111111|Lot 28, Simpang Tiga Talang, 33000 Kuala Kangsar, Perak|Computer Science|admin
-1001|aki@gmail.com|123456|Aki|0193673378|Tekun|Computer Science|student
-1002|zani@gmail.com|789000|Zani|012345678|Restu|Accounting|student
-1003|miyabi@gmail.com|123456|MIyabi|0119876543|Hollow Zero|Engineering|student
-1004|syedsaidsheikh@gmail.com|musangkingxll|Syed Haikal|010-9731652|8/F-2, Permatang Damar Laut, 11960, Bayan Lepas, Pulau Pinang|Computer Science|student
-1005|lynae@gmail.com|123456|Lynae|1234567890|Lahai Roi|Arts|student
+1000|admin@usm.my|123456|System Admin|04-6533888|USM Main Campus, 11800 Penang|Administration|admin
+1001|aki@student.usm.my|123456|Aki|019-3673378|Desasiswa Tekun, Bilik A-2-10|Computer Science|student
+1002|sarah.ahmad@student.usm.my|123456|Sarah Ahmad|017-4521098|Desasiswa Restu, Bilik B-1-05|Accounting|student
+1003|john.tan@student.usm.my|123456|John Tan|012-3456789|Desasiswa Saujana, Bilik C-3-12|Engineering|student
+1004|syed.haikal@student.usm.my|123456|Syed Haikal|010-9731652|8/F-2, Permatang Damar Laut, Bayan Lepas|Computer Science|student
+1005|miyabi@student.usm.my|123456|Miyabi|011-9876543|Desasiswa Aman Damai, Bilik D-4-01|Graphic Design|student
+1006|lynae@student.usm.my|123456|Lynae|018-7766554|Taman Pekaka, Block 31, Penang|Fine Arts|student
+1007|muthu.k@student.usm.my|123456|Muthu Kumar|016-5544332|Desasiswa Cahaya Gemilang, Bilik E-2-20|Physics|student
+1008|jessica.lim@student.usm.my|123456|Jessica Lim|014-2233445|Desasiswa Indah Kembara, Bilik F-1-15|Biology|student
+1009|ahmad.fawwaz@student.usm.my|123456|Ahmad Fawwaz|013-1122334|Sunny Ville Condo, Batu Uban, Penang|Management|student

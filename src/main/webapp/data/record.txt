@@ -1,6 +1,6 @@
 RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date|ReturnedDate
-RCD001|2222|1001|1000|Rent|1|2026-01-10|2026-01-17
-RCD002|Lalalala|1002|1000|Purchase|50|2026-01-10|N/A
-RCD003|ma|1001|1000|Rent|4|2026-01-11|2026-01-17
-RCD004|mimi|1001|1000|Purchase|10|2026-01-11|N/A
-RCD005|Lalalat|1003|1000|Rent|23|2026-01-11|2026-01-17
+RCD1001|Art Subjects by Howard Singerman|1001|1002|Rent|12.00|2026-01-09|N/A
+RCD1002|All my books in foreign tongues|1005|1003|Rent|10.00|2026-01-08|N/A
+RCD1003|Effective Java (3rd Edition)|1001|1004|Purchase|55.00|2025-12-15|N/A
+RCD1004|Principles of Marketing: Global Edition|1001|1009|Purchase|45.00|2025-10-20|N/A
+RCD1005|Advanced Problems in Mathematics|1003|1001|Rent|25.00|2025-11-10|2025-11-17
