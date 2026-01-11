@@ -14,7 +14,7 @@ public class EditProfileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Get User ID
+        //getting the current user session to check login status
         HttpSession session = request.getSession();
         String userID = (String) session.getAttribute("userID");
 
@@ -23,20 +23,19 @@ public class EditProfileServlet extends HttpServlet {
             return;
         }
 
-        // 2. Get New Data from Form
+        //retrieving the updated profile details from the form
         String newName = request.getParameter("fullName");
         String newPhone = request.getParameter("phone");
         String newAddress = request.getParameter("address");
         String newMajor = request.getParameter("major");
 
-        // 3. Update the File
-        // 🟢 FIXED: Added 'getServletContext()' so it finds the file correctly
+        //calling the file manager to save the new details to the text file
         FileManager.updateUser(getServletContext(), userID, newName, newPhone, newAddress, newMajor);
 
-        // 4. Update the Session (so the "Welcome, Name" changes instantly)
+        //updating the session variable so the welcome name changes instantly
         session.setAttribute("userName", newName);
 
-        // 5. Refresh Page
+        //displaying a success popup and reloading the dashboard
         response.setContentType("text/html");
         response.getWriter().println("<script>");
         response.getWriter().println("alert('Profile Updated Successfully! ✅');");

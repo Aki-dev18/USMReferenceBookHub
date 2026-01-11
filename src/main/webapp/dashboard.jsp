@@ -6,7 +6,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <%
-    // 1. Security Check
+    //logic for security check and session validation
     String userID = (String) session.getAttribute("userID");
     String userName = (String) session.getAttribute("userName");
 
@@ -15,17 +15,16 @@
         return;
     }
 
-    // 2. Fetch Full User Details
-    // 🟢 FIXED: We pass 'application' (which is the JSP word for ServletContext)
+    //logic for fetching full user details via filemanager
     String[] userDetails = FileManager.getUserByID(application, userID);
 
-    // Default values
+    //logic for setting default values
     String email = "N/A";
     String phone = "N/A";
     String address = "N/A";
     String major = "N/A";
 
-    // 3. Extract data if found
+    //logic for extracting user data if found
     if (userDetails != null && userDetails.length >= 7) {
         email = userDetails[1];
         phone = userDetails[4];
@@ -39,13 +38,14 @@
     <title>BookHub Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
     <style>
-        /* --- 1. CSS VARIABLES --- */
+        /* styling for css variables and main theme */
         :root {
             --main-purple: #DDA0DD;
             --darker-purple: #BA55D3;
             --text-color: #333;
         }
 
+        /* styling for overall page settings */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -53,7 +53,7 @@
             background-color: #ffffff;
         }
 
-        /* --- 2. HEADER --- */
+        /* styling for header section */
         .header {
             background-color: var(--main-purple);
             color: white;
@@ -62,6 +62,7 @@
             position: relative;
         }
 
+        /* styling for header title text */
         .header h1 {
             margin: 10px 0 0 0;
             font-size: 32px;
@@ -70,6 +71,7 @@
             letter-spacing: 1px;
         }
 
+        /* styling for logout button positioning */
         .logout-btn {
             position: absolute;
             top: 20px;
@@ -82,11 +84,14 @@
             font-weight: bold;
             font-size: 14px;
         }
+
+        /* styling for logout button hover effect */
         .logout-btn:hover { background-color: rgba(255,255,255,0.4); }
 
+        /* styling for logo placeholder */
         .logo-placeholder { font-size: 50px; }
 
-        /* --- 3. PROFILE SECTION --- */
+        /* styling for profile section container */
         .profile-container {
             display: flex;
             justify-content: space-between;
@@ -96,17 +101,20 @@
             margin: 0 auto;
         }
 
+        /* styling for profile info text alignment */
         .profile-info {
             flex: 1;
             text-align: left;
         }
 
+        /* styling for profile greeting heading */
         .profile-info h1 {
             font-size: 36px;
             margin-bottom: 10px;
             text-transform: uppercase;
         }
 
+        /* styling for individual info rows */
         .info-row {
             display: flex;
             align-items: flex-start;
@@ -116,14 +124,17 @@
             line-height: 1.4;
         }
 
+        /* styling for info labels */
         .info-label {
             font-weight: bold;
             min-width: 90px;
             color: #333;
         }
 
+        /* styling for info values */
         .info-value { flex: 1; }
 
+        /* styling for profile action buttons layout */
         .profile-buttons {
             flex: 1;
             display: flex;
@@ -132,7 +143,7 @@
             align-items: flex-end;
         }
 
-        /* --- QR CODE BOX --- */
+        /* styling for qr code section layout */
         .qr-section {
             display: flex;
             justify-content: center;
@@ -140,6 +151,7 @@
             padding: 0 20px
         }
 
+        /* styling for empty qr placeholder box */
         .qr-box {
             width: 160px;
             height: 160px;
@@ -157,6 +169,7 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
         }
 
+        /* styling for general action buttons */
         .action-btn {
             background-color: var(--darker-purple);
             color: white;
@@ -172,9 +185,10 @@
             transition: 0.3s;
         }
 
+        /* styling for action button hover effect */
         .action-btn:hover { background-color: #9932CC; transform: scale(1.02); }
 
-        /* --- 4. TABS & STICKY WRAPPER --- */
+        /* styling for sticky navigation wrapper */
         .sticky-wrapper {
             position: sticky;
             top: 0;
@@ -182,12 +196,14 @@
             box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
         }
 
+        /* styling for tab bar layout */
         .tab-bar {
             background-color: var(--main-purple);
             display: flex;
             width: 100%;
         }
 
+        /* styling for individual tab buttons */
         .tab-button {
             background-color: transparent;
             border: none;
@@ -202,13 +218,16 @@
             text-align: center;
         }
 
+        /* styling for active tab state */
         .tab-button.active {
             background-color: var(--darker-purple);
             color: white;
         }
 
+        /* styling for tab button hover effect */
         .tab-button:hover { background-color: rgba(255, 255, 255, 0.2); }
 
+        /* styling for search bar container */
         .search-container {
             background-color: var(--darker-purple);
             padding: 15px;
@@ -221,6 +240,7 @@
             font-size: 20px;
         }
 
+        /* styling for search input field */
         .search-input {
             width: 50%;
             padding: 10px;
@@ -229,26 +249,29 @@
             font-size: 16px;
         }
 
-        /* --- 5. CONTENT AREA --- */
+        /* styling for main content area layout */
         .content-area {
             text-align: center;
             min-height: 800px;
         }
 
+        /* styling for inner content width constraint */
         .inner-content {
             padding: 40px;
             max-width: 1000px;
             margin: 0 auto;
         }
 
+        /* styling for tab content switching */
         .tab-content {
             display: none;
             animation: fadeEffect 0.5s;
         }
 
+        /* styling for fade animation */
         @keyframes fadeEffect { from {opacity: 0;} to {opacity: 1;} }
 
-        /* --- MODAL STYLES --- */
+        /* styling for modal background overlay */
         .modal {
             display: none;
             position: fixed;
@@ -260,6 +283,7 @@
             background-color: rgba(0,0,0,0.5);
         }
 
+        /* styling for modal content box */
         .modal-content {
             background-color: white;
             margin: 10% auto;
@@ -271,6 +295,7 @@
             position: relative;
         }
 
+        /* styling for modal close button */
         .close-btn {
             position: absolute;
             top: 10px;
@@ -279,8 +304,11 @@
             cursor: pointer;
             color: #aaa;
         }
+
+        /* styling for close button hover effect */
         .close-btn:hover { color: black; }
 
+        /* styling for file input fields */
         input[type="file"] {
             margin: 20px 0;
             padding: 10px;
@@ -289,7 +317,7 @@
             box-sizing: border-box;
         }
 
-        /* Container to give some breathing room */
+        /* styling for inventory table container */
         .inventory-container {
             padding: 20px;
             background: #fff;
@@ -298,15 +326,16 @@
             margin-top: 20px;
         }
 
-        /* The Table Style */
+        /* styling for modern table layout */
         .modern-table {
             width: 100%;
-            border-collapse: collapse; /* Removes the double lines */
+            border-collapse: collapse;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* styling for table headers */
         .modern-table th {
-            background-color: #a25ccf; /* Matches your purple theme */
+            background-color: #a25ccf;
             color: white;
             padding: 12px;
             text-align: left;
@@ -315,28 +344,31 @@
             letter-spacing: 1px;
         }
 
+        /* styling for table cells */
         .modern-table td {
             padding: 15px 12px;
             border-bottom: 1px solid #eee;
             color: #444;
         }
 
-        /* Hover effect to make it feel interactive */
+        /* styling for table row hover effect */
         .modern-table tbody tr:hover {
             background-color: #f9f0ff;
         }
 
+        /* styling for book title text */
         .book-title {
             font-weight: bold;
             color: #333;
         }
 
+        /* styling for book price text */
         .book-price {
             color: #a25ccf;
             font-weight: 600;
         }
 
-        /* Status Badge */
+        /* styling for status tags */
         .status-tag {
             background: #d4edda;
             color: #155724;
@@ -346,11 +378,13 @@
             font-weight: bold;
         }
 
+        /* styling for empty inventory message */
         .empty-msg {
             text-align: center;
             padding: 30px;
             color: #888;}
 
+        /* styling for delete button */
         .btn-delete {
             background-color: #ff5e62;
             color: white;
@@ -362,11 +396,12 @@
             transition: background 0.3s ease;
         }
 
+        /* styling for delete button hover effect */
         .btn-delete:hover {
-            background-color: #d4145a; /* Darker pink/red on hover */
+            background-color: #d4145a;
         }
 
-        /* Adjusting the tag color if it's "Sold" vs "Available" */
+        /* styling for specific tag overrides */
         .status-tag {
             padding: 4px 10px;
             border-radius: 20px;
@@ -374,58 +409,60 @@
             font-weight: bold;
             background: #e0e0e0;
         }
-        /* Marketplace Section*/
-                /* Container for the books */
-                .book-grid {
-                    display: grid;
-                    /* This magic line makes them side-by-side and wrap automatically */
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 20px; /* Space between the cards */
-                    padding: 20px 0;
-                }
 
-                /* Styling for individual cards to make them look uniform */
-                .book-card {
-                    background: white;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    padding: 15px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                    display: flex;
-                    flex-direction: column; /* Stacks image, title, price vertically inside the card */
-                    transition: transform 0.2s;
-                }
+        /* styling for marketplace book grid container */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
 
-                .book-card:hover {
-                    transform: translateY(-5px); /* Nice little lift effect on hover */
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                }
+        /* styling for marketplace book cards */
+        .book-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
 
-                     .book-title {
-                         font-size: 16px;
-                         font-weight: bold;
-                         margin: 10px 0;
-                         color: #333;
-                         white-space: nowrap;
-                         overflow: hidden;
-                         text-overflow: ellipsis; /* Adds "..." if title is too long */
-                     }
+        /* styling for book card hover effect */
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
 
-                     .book-price {
-                         color: #27ae60;
-                         font-weight: bold;
-                         font-size: 18px;
-                         margin-bottom: 10px;
-                     }
+        /* styling for card title text */
+        .book-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        /*----------------------HISTORY CLASSES SECTION BEGINNING----------------------*/
-        /* Main wrapper for the history section*/
+        /* styling for card price text */
+        .book-price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* styling for history container wrapper */
         .history-container {
             display: flex;
             gap: 20px;
             text-align: left;
         }
-        /*Sub-container to contain each purchase history and renting history*/
+
+        /* styling for history sub-containers */
         .history-box {
             flex: 1;
             background-color: #f9f9f9;
@@ -434,14 +471,16 @@
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        /*Class to style the header title of each sub-container*/
+
+        /* styling for history section headers */
         .history-box h3 {
             border-bottom: 2px solid var(--main-purple);
             padding-bottom: 10px;
             margin-top: 0;
             color: var(--darker-purple);
         }
-        /*Class to stylize items inside each sub-container*/
+
+        /* styling for individual history items */
         .history-item {
             background: white;
             border: 1px solid #eee;
@@ -450,16 +489,17 @@
             border-radius: 5px;
             font-size: 14px;
         }
-        /*To stylize the date and transaction*/
+
+        /* styling for history transaction details */
         .record-and-date {
             font-size: 12px;
             color: #888;
             float: right;
         }
-        /*----------------------HISTORY CLASSES SECTION END----------------------*/
     </style>
 
     <script>
+        //function for handling tab switching logic
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
@@ -474,12 +514,19 @@
             evt.currentTarget.className += " active";
         }
 
+        //function for opening qr modal
         function openQRModal() { document.getElementById("qrModal").style.display = "block"; }
+
+        //function for closing qr modal
         function closeQRModal() { document.getElementById("qrModal").style.display = "none"; }
 
+        //function for opening profile edit modal
         function openEditModal() { document.getElementById("editModal").style.display = "block"; }
+
+        //function for closing profile edit modal
         function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
 
+        //function for handling outside clicks to close modals
         window.onclick = function(event) {
             var m1 = document.getElementById("qrModal");
             var m2 = document.getElementById("editModal");
@@ -487,14 +534,17 @@
             if (event.target == m2) m2.style.display = "none";
         }
 
+        //function for opening add book modal
         function openAddBookModal() { document.getElementById("addBookModal").style.display = "block"; }
+
+        //function for closing add book modal
         function closeAddBookModal() { document.getElementById("addBookModal").style.display = "none"; }
 
+        //function for handling book status changes and prompts
         function handleStatusChange(selectElement, bookId) {
             const status = selectElement.value;
             const customerIdInput = document.getElementById('customerId_' + bookId);
 
-            // Create or find a hidden input for returnDate
             let returnDateInput = document.getElementById('returnDate_' + bookId);
             if (!returnDateInput) {
                 returnDateInput = document.createElement('input');
@@ -513,7 +563,6 @@
                 }
                 customerIdInput.value = customerId;
 
-                // NEW: Ask for Return Date ONLY if Rented
                 if (status === "Rented") {
                     const rDate = prompt("Enter Expected Return Date (YYYY-MM-DD):", "2026-01-17");
                     returnDateInput.value = (rDate && rDate.trim() !== "") ? rDate : "N/A";
@@ -525,6 +574,7 @@
             document.getElementById('statusForm_' + bookId).submit();
         }
 
+        //function for opening edit book details modal
         function openEditBookModal(id, title, sale, rent) {
             document.getElementById("editBookId").value = id;
             document.getElementById("editTitle").value = title;
@@ -533,11 +583,12 @@
             document.getElementById("editBookModal").style.display = "block";
         }
 
+        //function for closing edit book details modal
         function closeEditBookModal() {
             document.getElementById("editBookModal").style.display = "none";
         }
 
-        // Update your existing window.onclick to handle closing the new modal
+        //function for handling outside click for edit book modal
         const originalOnClick = window.onclick;
         window.onclick = function(event) {
             if (originalOnClick) originalOnClick(event);
@@ -545,12 +596,12 @@
             if (event.target == mEdit) mEdit.style.display = "none";
         }
 
-        // 🟢 UPDATED: SEARCH BOTH MARKETPLACE (CARDS) AND INVENTORY (TABLE)
+        //function for searching across marketplace, history and inventory
         function searchBooks() {
             var input = document.getElementById("searchInput");
             var filter = input.value.toUpperCase();
 
-            // --- 1. SEARCH MARKETPLACE (CARDS) ---
+            //search logic for marketplace cards
             var cards = document.getElementsByClassName("book-card");
             for (var i = 0; i < cards.length; i++) {
                 var titleElement = cards[i].getElementsByClassName("book-title")[0];
@@ -564,10 +615,9 @@
                 }
             }
 
-            // --- 3. SEARCH HISTORY (ITEMS) ---
+            //search logic for history items
             var historyItems = document.getElementsByClassName("history-item");
             for (var k = 0; k < historyItems.length; k++) {
-                // In your code, the Title is inside the <strong> tag
                 var titleStrong = historyItems[k].getElementsByTagName("strong")[0];
 
                 if (titleStrong) {
@@ -576,14 +626,12 @@
                 }
             }
 
-            // --- 3. SEARCH INVENTORY (TABLE ROWS) ---
-            // Find the table and get all rows inside the body
+            //search logic for inventory table rows
             var table = document.querySelector(".modern-table tbody");
             if (table) {
                 var rows = table.getElementsByTagName("tr");
 
                 for (var j = 0; j < rows.length; j++) {
-                    // Look for the cell with class "book-title"
                     var titleCell = rows[j].getElementsByClassName("book-title")[0];
 
                     if (titleCell) {
@@ -639,18 +687,17 @@
 
         <div class="qr-section">
             <%
+                //logic for locating user qr code image
                 String qrPath = null;
                 String[] exts = {".jpg", ".jpeg", ".png"};
 
-                // 🟢 FIXED: NO MORE HARDCODED PATHS!
-                // We ask 'application.getRealPath' to find the folder on ANY computer.
                 for (String ext : exts) {
                     String relativePath = "/images/profiles/" + userID + ext;
                     String realPath = application.getRealPath(relativePath);
 
                     File checkFile = new File(realPath);
                     if (checkFile.exists()) {
-                        qrPath = "images/profiles/" + userID + ext; // Found it!
+                        qrPath = "images/profiles/" + userID + ext;
                         break;
                     }
                 }
@@ -690,7 +737,7 @@
 
 
     <div class="content-area">
-            <%-- -------------------------------------MARKETPLACE SECTION------------------------------------------ --%>
+
             <div id="Marketplace" class="tab-content" style="display: block;">
                 <div class="inner-content">
                     <h2>🛒 The Marketplace</h2>
@@ -720,11 +767,11 @@
                                                 if (this.src.endsWith('.jpg')) {
                                                     this.src = '${pageContext.request.contextPath}/images/books/${book.bookID}.png';
                                                 }
-                                                // 2. If .png fails, try .jpeg
+                                                //logic for image extension fallback
                                                 else if (this.src.endsWith('.png')) {
                                                     this.src = '${pageContext.request.contextPath}/images/books/${book.bookID}.jpeg';
                                                 }
-                                                // 3. If everything fails, hide the image and show the fallback div
+                                                //logic for hiding image on error
                                                 else {
                                                     this.style.display='none';
                                                     this.nextElementSibling.style.display='flex';
@@ -762,12 +809,12 @@
                 </div>
             </div>
 
-            <%-- -------------------------------------HISTORY SECTION------------------------------------------ --%>
             <div id="History" class="tab-content">
                 <div class="inner-content">
                     <h2>📜 Order History</h2>
                     <p>Here are your past transactions.</p>
                     <%
+                        //logic for reading transaction records and sorting lists
                         java.util.List<String[]> myPurchases = new java.util.ArrayList<>();
                         java.util.List<String[]> myRents = new java.util.ArrayList<>();
 
@@ -844,8 +891,7 @@
                 </div>
             </div>
 
-        <%-- -------------------------------------INVENTORY SECTION------------------------------------------ --%>
-                <div id="Inventory" class="tab-content">
+        <div id="Inventory" class="tab-content">
                     <div class="inventory-container">
                         <table class="modern-table">
                             <thead>
@@ -860,11 +906,12 @@
                             </thead>
                             <tbody>
                             <%
+                                //logic for listing user books in table
                                 List<String[]> books = (List<String[]>) request.getAttribute("userBooks");
                                 if (books != null && !books.isEmpty()) {
                                     for (String[] book : books) {
 
-                                        // --- IMAGE LOGIC START ---
+                                        //logic for finding book cover image
                                         String bookId = book[0];
                                         String imagePath = "images/books/default.png";
                                         String[] extensions = {".jpeg", ".jpg", ".png"};
@@ -872,7 +919,6 @@
                                         for (String ext : extensions) {
                                             String testPath = "/images/books/" + bookId + ext;
                                             if (new java.io.File(application.getRealPath(testPath)).exists()) {
-                                                // Added System.currentTimeMillis() to prevent browser caching
                                                 imagePath = "images/books/" + bookId + ext + "?t=" + System.currentTimeMillis();
                                                 break;
                                             }
@@ -931,8 +977,7 @@
                             </tbody>
                         </table>
                     </div>
-                </div> </div> ```
-
+                </div> </div>
 
 
     <div id="qrModal" class="modal">

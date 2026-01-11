@@ -11,22 +11,19 @@ import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 
-// 1. THIS ANNOTATION IS REQUIRED FOR FILE UPLOADS
+//config for handling file uploads since we are sending images
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
-        maxFileSize = 1024 * 1024 * 10,      // 10 MB
-        maxRequestSize = 1024 * 1024 * 15    // 15 MB
+        fileSizeThreshold = 1024 * 1024 * 1,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 15
 )
 @WebServlet("/updateQR")
 public class UpdateQRServlet extends HttpServlet {
 
-    // 🟢 REMOVED: private static final String UPLOAD_DIR = "C:/...";
-    // We will calculate this dynamically inside the method now.
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Get the current User ID
+        //getting the current user id from the session
         HttpSession session = request.getSession();
         String userID = (String) session.getAttribute("userID");
 
@@ -35,22 +32,21 @@ public class UpdateQRServlet extends HttpServlet {
             return;
         }
 
-        // 2. Get the File from the Form
+        //retrieving the uploaded file from the request
         Part filePart = request.getPart("qrFile");
 
         if (filePart != null && filePart.getSize() > 0) {
 
-            // 🟢 STEP 3: Find the path dynamically
-            // Ask Tomcat: "Where is the 'images/profiles' folder on THIS computer?"
+            //asking tomcat for the real path to the images folder
             String uploadPath = getServletContext().getRealPath("") + File.separator + "images" + File.separator + "profiles";
 
-            // Safety: Create the directory if it doesn't exist
+            //creating the folder if it doesnt exist yet
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
             }
 
-            // 4. Determine File Extension (jpg, png, etc.)
+            //extracting the file extension from the original name
             String fileName = filePart.getSubmittedFileName();
             String extension = "";
             int i = fileName.lastIndexOf('.');
@@ -58,11 +54,10 @@ public class UpdateQRServlet extends HttpServlet {
                 extension = fileName.substring(i);
             }
 
-            // 5. Create the New Name (e.g., "1001.jpg")
+            //renaming the file to match the user id
             String newFileName = userID + extension;
 
-            // === CLEANUP: Delete any old QR codes ===
-            // We search inside our dynamic 'uploadPath' now
+            //deleting any old qr codes so we dont have duplicates
             String[] commonExtensions = {".jpg", ".jpeg", ".png"};
             for (String ext : commonExtensions) {
                 File oldFile = new File(uploadPath + File.separator + userID + ext);
@@ -71,11 +66,10 @@ public class UpdateQRServlet extends HttpServlet {
                 }
             }
 
-            // 6. Save the file
-            // We write to the dynamic path
+            //saving the actual file to the directory
             filePart.write(uploadPath + File.separator + newFileName);
 
-            // 7. Success!
+            //showing a success alert and reloading dashboard
             response.setContentType("text/html");
             response.getWriter().println("<script>");
             response.getWriter().println("alert('QR Code Uploaded Successfully! 📸');");
@@ -83,7 +77,7 @@ public class UpdateQRServlet extends HttpServlet {
             response.getWriter().println("</script>");
 
         } else {
-            // No file uploaded
+            //redirecting if no file was actually selected
             response.sendRedirect("dashboard.jsp?error=nofile");
         }
     }

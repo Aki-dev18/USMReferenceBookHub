@@ -12,14 +12,16 @@ import java.io.IOException;
 public class UpdateStatusServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //getting the book details and new status sent from the jsp
         String bookId = request.getParameter("bookId");
         String newStatus = request.getParameter("newStatus");
         String customerId = request.getParameter("customerId");
-        String returnDate = request.getParameter("returnDate"); // Captured from JS prompt
+        String returnDate = request.getParameter("returnDate");
 
-        // Update the method call in your ChangeBookStatus to pass the returnDate
+        //calling the file manager logic to update the status and record the transaction
         FileManager.ChangeBookStatus(getServletContext(), bookId, newStatus, customerId, returnDate);
 
+        //redirecting back to the main dashboard page
         response.sendRedirect("dashboard");
     }
 }

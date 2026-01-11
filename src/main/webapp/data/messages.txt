@@ -8,3 +8,5 @@ M1006|1001|1002|That's very cheap!|2026-01-10 12:45:55
 M1007|1002|1001|Then let's set a meet up date.|2026-01-10 12:53:20
 M1008|1001|1002|How about Friday next week?|2026-01-10 12:54:26
 M1009|1002|1001|Yup sounds good|2026-01-10 12:55:12
+M1010|1000|1004|yow bro is the book available?|2026-01-11 10:12:03
+M1011|1004|1000|yeah yeah its with me|2026-01-11 10:12:58

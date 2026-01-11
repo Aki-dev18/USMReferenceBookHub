@@ -11,28 +11,29 @@ import java.io.IOException;
 @WebServlet("/deleteBook")
 public class DeleteBookServlet extends HttpServlet {
 
+    //method for handling the deletion request when the button is clicked
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Get the bookId from the hidden input in your JSP
+        //getting the book id that was hidden in the form
         String bookId = request.getParameter("bookId");
 
-        // 2. Safety check: make sure ID is not null
+        //checking to make sure the id actually exists before trying to delete
         if (bookId != null && !bookId.isEmpty()) {
-            // 3. Call your method to update the books.txt file
+            //calling the file manager to actually remove the line from the file
             FileManager.DeleteBook(getServletContext(), bookId);
         }
 
-        // 4. IMPORTANT: Redirect to the Dashboard Servlet
-        // This makes the page refresh and show the updated list (minus the deleted book)
+        //reloading the dashboard page so the book disappears from the list
         response.sendRedirect("dashboard");
     }
 
+    //method for blocking direct access to this url
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // If someone tries to access this URL directly via browser, just send them home
+        //sending them back to the dashboard if they try to type the url manually
         response.sendRedirect("dashboard");
     }
 }

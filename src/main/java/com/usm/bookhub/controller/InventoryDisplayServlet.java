@@ -15,23 +15,23 @@ public class InventoryDisplayServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Get the session
+        //getting the current session to check if someone is logged in
         HttpSession session = request.getSession(false);
 
-        // 2. Check if user is logged in
+        //checking if the session exists and has a valid user id
         if (session != null && session.getAttribute("userID") != null) {
             String ownerId = (String) session.getAttribute("userID");
 
-            // 3. Fetch books specifically for this user
+            //fetching only the books that belong to this specific user
             List<String[]> userBooks = FileManager.ListAllBooksFromUser(getServletContext(), ownerId);
 
-            // 4. Pass the data to the JSP
+            //attaching the list of books to the request so the jsp can display them
             request.setAttribute("userBooks", userBooks);
 
-            // 5. Forward to the JSP page
+            //sending everything to the dashboard jsp page to render
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
         } else {
-            // Not logged in? Send back to login page
+            //redirecting back to login page if they arent logged in
             response.sendRedirect("index.jsp");
         }
     }

@@ -1,5 +1,3 @@
-// This controller is defunct
-
 package com.usm.bookhub.controller;
 
 import com.usm.bookhub.model.Book;
@@ -16,15 +14,16 @@ import java.util.List;
 @WebServlet("/defunct")
 public class DisplayAvailableBookServlet extends HttpServlet{
 
+    //method for handling the get request to show available books
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
 
-        // Getting all the book data from books.txt file
+        //getting all the book data from the text file
         List<String> lines = FileManager.readAllLines(getServletContext(), "books.txt");
 
         List<Book> availableBooks = new ArrayList<>();
 
-        //Reading each book into a new list based on the category of data
+        //looping through the lines to filter out only the available books
         for(String line : lines) {
             String [] parts = line.split("\\|");
 
@@ -40,10 +39,10 @@ public class DisplayAvailableBookServlet extends HttpServlet{
             }
         }
 
-        //Pass the filtered list to the JSP
+        //sending the list of books to the jsp so it can be displayed
         request.setAttribute("bookList", availableBooks);
 
-        //Forward to the JSP
+        //forwarding the request to the dashboard page
         request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
 

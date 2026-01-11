@@ -16,50 +16,49 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Get input from the Login Form
+        //getting the email and password the user typed in the form
         String emailInput = request.getParameter("email");
         String passwordInput = request.getParameter("password");
 
-        // 🟢 STEP 2: FIXED
-        // We now pass 'getServletContext()' so FileManager knows the correct path on ANY laptop
+        //reading all the lines from users.txt using the context so the path is correct
         List<String> lines = FileManager.readAllLines(getServletContext(), "users.txt");
 
         boolean isFound = false;
         String foundName = "";
         String foundID = "";
 
-        // 3. Search for the user (The "Loop" Logic)
+        //looping through every user line in the file to find a match
         for (String line : lines) {
-            // Data format: UserID|Email|Password|FullName|...
+            //splitting the line data by the pipe symbol
             String[] parts = line.split("\\|");
 
-            // Safety check: Make sure the line has enough data
+            //making sure the line actually has data before we check it
             if (parts.length >= 4) {
                 String emailInFile = parts[1];
                 String passwordInFile = parts[2];
 
-                // CHECK: Do they match?
+                //checking if the email and password match exactly
                 if (emailInFile.equals(emailInput) && passwordInFile.equals(passwordInput)) {
                     isFound = true;
                     foundID = parts[0];
                     foundName = parts[3];
-                    break; // Stop looking, we found them!
+                    break;
                 }
             }
         }
 
-        // 4. Handle the Result
+        //handling what happens after the loop finishes
         if (isFound) {
-            // SUCCESS: Create a "Session"
+            //creating a session and saving their info so they stay logged in
             HttpSession session = request.getSession();
             session.setAttribute("userID", foundID);
             session.setAttribute("userName", foundName);
 
-            // Send to Dashboard
+            //sending them to the dashboard page
             response.sendRedirect("dashboard");
 
         } else {
-            // FAILURE: Wrong email or password
+            //showing a popup alert if the login failed
             response.setContentType("text/html");
             response.getWriter().println("<script>");
             response.getWriter().println("alert('Invalid Email or Password! Try again.');");

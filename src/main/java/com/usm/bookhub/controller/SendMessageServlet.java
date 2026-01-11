@@ -17,7 +17,7 @@ public class SendMessageServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Get Session Info
+        //getting the current session info to know who is sending
         HttpSession session = request.getSession();
         String senderID = (String) session.getAttribute("userID");
 
@@ -26,7 +26,7 @@ public class SendMessageServlet extends HttpServlet {
             return;
         }
 
-        // 2. Get Form Data
+        //retrieving the receiver id and message text from the form
         String receiverID = request.getParameter("receiverID");
         String messageText = request.getParameter("message");
 
@@ -35,46 +35,47 @@ public class SendMessageServlet extends HttpServlet {
             return;
         }
 
-        // 3. Find the Path
+        //finding the exact path to the messages text file
         String realPath = getServletContext().getRealPath("/data/messages.txt");
         File file = new File(realPath);
 
-        // 4. GENERATE INCREMENTING ID (The New Logic)
-        int nextIdNum = 1001; // Default start if file is empty
+        //logic for generating the next message id by scanning the file
+        int nextIdNum = 1001;
 
         if (file.exists()) {
             try (Scanner scanner = new Scanner(file)) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
-                    // Line format: M1001|Sender|Receiver...
+                    //splitting the line to get the id part
                     String[] parts = line.split("\\|");
 
                     if (parts.length > 0 && parts[0].startsWith("M")) {
                         try {
-                            // Extract number part: "M1005" -> 1005
+                            //extracting the number from the id string
                             String numberPart = parts[0].substring(1);
                             int currentNum = Integer.parseInt(numberPart);
 
-                            // If this ID is bigger, update our next target
+                            //updating the next id if we find a bigger one
                             if (currentNum >= nextIdNum) {
                                 nextIdNum = currentNum + 1;
                             }
                         } catch (NumberFormatException e) {
-                            // Ignore weird lines
+                            //ignoring lines that are formatted weirdly
                         }
                     }
                 }
             }
         }
 
-        String msgID = "M" + nextIdNum; // Result: "M1006"
+        String msgID = "M" + nextIdNum;
 
-        // 5. Generate Timestamp
+        //creating a timestamp for when the message was sent
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        // 6. Append to File
+        //formatting the new message line to save
         String line = String.format("%s|%s|%s|%s|%s", msgID, senderID, receiverID, messageText, timestamp);
 
+        //appending the new message line to the file
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             writer.write(line);
             writer.newLine();
@@ -82,7 +83,7 @@ public class SendMessageServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        // 7. Redirect back to chat
+        //redirecting the user back to the chat screen
         response.sendRedirect("chat.jsp?withUser=" + receiverID);
     }
 }

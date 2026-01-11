@@ -1,6 +1,6 @@
 package com.usm.bookhub.util;
 
-import jakarta.servlet.ServletContext; // Make sure this is jakarta (Tomcat 10)
+import jakarta.servlet.ServletContext;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,18 +8,17 @@ import java.util.Scanner;
 
 public class FileManager {
 
-    // 🟢 REMOVED: private static final String BASE_PATH...
-    // We now calculate the path dynamically inside each method.
-
+    //method for reading everything inside a text file
     public static List<String> readAllLines(ServletContext context, String fileName) {
         List<String> lines = new ArrayList<>();
 
-        // Ask Tomcat where "data/fileName" is on THIS specific computer
+        //finding where the file actually is inside the project
         String realPath = context.getRealPath("/data/" + fileName);
         File file = new File(realPath);
 
+        //checking if the file even exists before we try to read it
         if (!file.exists()) {
-            System.out.println("File not found at: " + realPath); // Helpful for debugging
+            System.out.println("File not found at: " + realPath);
             return lines;
         }
 
@@ -34,18 +33,19 @@ public class FileManager {
         return lines;
     }
 
+    //method for writing just one line into the file
     public static void writeLine(ServletContext context, String fileName, String data) {
         try {
             String realPath = context.getRealPath("/data/" + fileName);
 
-            // "true" means append to the end of the file
+            //setting true so we append to the end instead of overwriting
             FileWriter fw = new FileWriter(realPath, true);
             BufferedWriter bw = new BufferedWriter(fw);
             PrintWriter out = new PrintWriter(bw);
 
             out.println(data);
 
-            // Always close your streams!
+            //closing everything so it saves properly
             out.close();
             bw.close();
             fw.close();
@@ -54,24 +54,22 @@ public class FileManager {
         }
     }
 
-    // === NEW METHOD: Find a specific user by ID ===
-    // Note: We added 'ServletContext context' to the parameters
+    //method for finding who the user is using their id
     public static String[] getUserByID(ServletContext context, String targetID) {
-        // Pass context to readAllLines
         List<String> lines = readAllLines(context, "users.txt");
 
         for (String line : lines) {
             String[] parts = line.split("\\|");
 
-            // parts[0] is the UserID.
+            //checking if this is the user we are looking for
             if (parts.length > 0 && parts[0].equals(targetID)) {
                 return parts;
             }
         }
-        return null; // User not found
+        return null;
     }
 
-    // 1. RE-WRITE the entire file (Used when editing/deleting)
+    //method for saving the whole list of users back to the file
     public static void saveAllUsers(ServletContext context, List<String> lines) {
         try {
             String realPath = context.getRealPath("/data/users.txt");
@@ -80,15 +78,14 @@ public class FileManager {
             for (String line : lines) {
                 out.println(line);
             }
-            out.close(); // Don't forget to close!
+            out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // 2. THE UPDATE LOGIC
+    //method for updating the user info when they edit their profile
     public static void updateUser(ServletContext context, String userId, String newName, String newPhone, String newAddress, String newMajor) {
-        // Pass context here
         List<String> lines = readAllLines(context, "users.txt");
         List<String> newLines = new ArrayList<>();
 
@@ -96,7 +93,7 @@ public class FileManager {
             String[] parts = line.split("\\|");
 
             if (parts.length >= 8 && parts[0].equals(userId)) {
-                // Keep ID, Email, Password, Role the same. Only change the rest.
+                //constructing the new line with updated info but keeping the old stuff too
                 String updatedLine = parts[0] + "|" + parts[1] + "|" + parts[2] + "|" +
                         newName + "|" + newPhone + "|" + newAddress + "|" + newMajor + "|" + parts[7];
                 newLines.add(updatedLine);
@@ -104,10 +101,10 @@ public class FileManager {
                 newLines.add(line);
             }
         }
-        // Pass context to save
         saveAllUsers(context, newLines);
     }
 
+    //method for overwriting a file with a completely new list
     public static void RewriteFile(ServletContext context, String fileName,List<String> UpdatedList) {
         String realPath = context.getRealPath("/data/" + fileName);
 
@@ -120,22 +117,24 @@ public class FileManager {
         }
     }
 
+    //method for getting all the books that belong to a specific person
     public static List<String[]> ListAllBooksFromUser(ServletContext context, String ownerId) {
 
         List<String> AllBookList = readAllLines(context, "books.txt");
         List<String[]> MatchedBookList = new ArrayList<String[]>();
 
         for (int i = 0; i < AllBookList.size(); i++) {
-           String book= AllBookList.get(i);
-           String[] parts=book.split("\\|");
+            String book= AllBookList.get(i);
+            String[] parts=book.split("\\|");
 
-           if (parts[4].equals(ownerId))
-               MatchedBookList.add(parts);
+            if (parts[4].equals(ownerId))
+                MatchedBookList.add(parts);
 
         }
         return MatchedBookList;
     }
 
+    //method for removing a book from the list
     public static void DeleteBook(ServletContext context, String bookId) {
         String realPath = context.getRealPath("/data/books.txt");
         List<String> AllBooks=readAllLines(context, "books.txt");
@@ -145,6 +144,7 @@ public class FileManager {
             String book= AllBooks.get(i);
             String[] parts=book.split("\\|");
 
+            //skipping the book we want to delete so it doesnt get saved
             if(!parts[0].equals(bookId))
                 UpdatedListBooks.add(book);
         }
@@ -152,6 +152,7 @@ public class FileManager {
 
     }
 
+    //method for changing the title or price of a book
     public static void UpdateBookDetails(ServletContext context, String bookId, String newTitle, String newSalePrice, String newRentPrice) {
         List<String> AllBooks = readAllLines(context, "books.txt");
         List<String> UpdatedListBooks = new ArrayList<String>();
@@ -171,7 +172,7 @@ public class FileManager {
         RewriteFile(context, "books.txt", UpdatedListBooks);
     }
 
-    // 🟢 Add this helper to remove old extensions before saving a new one
+    //method for deleting the old image so it doesnt clash with the new one
     public static void deleteOldImages(ServletContext context, String bookId) {
         String folderPath = context.getRealPath("/images/books/");
         String[] extensions = {".jpeg", ".jpg", ".png"};
@@ -179,12 +180,12 @@ public class FileManager {
         for (String ext : extensions) {
             File file = new File(folderPath + File.separator + bookId + ext);
             if (file.exists()) {
-                file.delete(); // Removes old file to prevent the JSP from finding it first
+                file.delete();
             }
         }
     }
 
-    // 🟢 Update the signature to accept 'returnDate'
+    //method for updating the book status to rented or purchased
     public static void ChangeBookStatus(ServletContext context, String bookId, String newStatus, String customerId, String returnDate) {
         List<String> AllBooks = readAllLines(context, "books.txt");
         List<String> UpdatedListBooks = new ArrayList<String>();
@@ -194,17 +195,16 @@ public class FileManager {
             String[] parts = book.split("\\|");
 
             if (parts[0].equals(bookId)) {
-                parts[5] = newStatus; // Update status column
+                parts[5] = newStatus;
                 book = String.join("|", parts);
 
-                // Log to record.txt if it's a Rent or Purchase
+                //checking if we need to record this transaction
                 if (newStatus.equalsIgnoreCase("Rented") || newStatus.equalsIgnoreCase("Purchased")) {
                     String title = parts[1];
                     String seller = parts[4];
                     String price = newStatus.equalsIgnoreCase("Rented") ? parts[3] : parts[2];
                     String type = newStatus.equalsIgnoreCase("Purchased") ? "Purchase" : "Rent";
 
-                    // 🟢 Pass the returnDate to the transaction logger
                     addTransactionRecord(context, title, customerId, seller, type, price, returnDate);
                 }
             }
@@ -213,17 +213,15 @@ public class FileManager {
         RewriteFile(context, "books.txt", UpdatedListBooks);
     }
 
-    // Helper method to append the transaction to record.txt
+    //method for adding the transaction into our record file
     public static void addTransactionRecord(ServletContext context, String title, String buyer, String seller, String type, String price, String returnDate) {
         List<String> allRecords = readAllLines(context, "record.txt");
         String recordID = String.format("RCD%03d", allRecords.size());
         String date = java.time.LocalDate.now().toString();
 
-        // Format: RecordID|BookTitle|BuyerID|SellerID|Type|Price|Date|ReturnDate
+        //putting all the info together in one string
         String recordLine = recordID + "|" + title + "|" + buyer + "|" + seller + "|" + type + "|" + price + "|" + date + "|" + returnDate;
 
         writeLine(context, "record.txt", recordLine);
     }
-
-
 }

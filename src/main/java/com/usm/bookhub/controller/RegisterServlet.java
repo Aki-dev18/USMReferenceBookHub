@@ -15,7 +15,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 1. Get data from the HTML form
+        //getting all the info the user typed into the signup form
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -23,32 +23,30 @@ public class RegisterServlet extends HttpServlet {
         String address = request.getParameter("address");
         String major = request.getParameter("major");
 
-        // 2. Generate a new User ID automatically
-        // 🟢 FIXED: Added 'getServletContext()' so it finds the file on any laptop
+        //logic for automatically making a new user id by checking the file
         List<String> users = FileManager.readAllLines(getServletContext(), "users.txt");
 
-        int newId = 1001; // Default starting ID
+        int newId = 1001;
 
         if (!users.isEmpty()) {
+            //grabbing the last line to calculate the next id number
             String lastLine = users.get(users.size() - 1);
-            String[] parts = lastLine.split("\\|"); // Split by "|"
+            String[] parts = lastLine.split("\\|");
             try {
                 int lastId = Integer.parseInt(parts[0]);
                 newId = lastId + 1;
             } catch (NumberFormatException e) {
-                // If the file is messy, stick to default
+                //ignoring errors if the file format is weird
             }
         }
 
-        // 3. Format the data string
-        // UserID|Email|Password|FullName|Phone|Address|Major|Role
+        //putting all the data together into one string separated by pipes
         String newUserLine = newId + "|" + email + "|" + password + "|" + fullName + "|" + phone + "|" + address + "|" + major + "|student";
 
-        // 4. Save to file
-        // 🟢 FIXED: Added 'getServletContext()' here too
+        //saving the new user line into the text file
         FileManager.writeLine(getServletContext(), "users.txt", newUserLine);
 
-        // 5. Success! Send them back to Login
+        //showing a success message with their new id and sending them to login
         response.setContentType("text/html");
         response.getWriter().println("<script type=\"text/javascript\">");
         response.getWriter().println("alert('Account created successfully! User ID: " + newId + "');");
