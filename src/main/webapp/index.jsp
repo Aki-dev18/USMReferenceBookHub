@@ -2,50 +2,59 @@
 <html>
 <head>
     <title>Welcome to BookHub</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+
     <style>
-        /* --- 1. CSS VARIABLES (Purple Theme) --- */
+        /* --- 1. THEME VARIABLES --- */
         :root {
-            --main-purple: #DDA0DD; /* Light Purple */
-            --darker-purple: #BA55D3; /* Darker Purple */
-            --deep-purple: #800080;
+            --main-purple: #DDA0DD;
+            --darker-purple: #BA55D3;
             --text-color: #333;
-            --bg-gray: #f4f4f4;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-gray);
+            background-color: var(--main-purple);
+            min-height: 100vh;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Full screen height */
-            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* --- 2. THE MAIN CARD --- */
+        /* --- 2. MAIN CARD --- */
         .container {
             background-color: white;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.1);
-            width: 400px;
+            width: 100%;
+            max-width: 400px;
             text-align: center;
-            border-top: 5px solid var(--darker-purple);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        h1 { color: var(--deep-purple); margin-bottom: 5px; }
-        p { color: #666; margin-top: 0; }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 28px;
+        }
 
-        /* --- 3. FORM INPUTS --- */
+        p { color: #666; margin-top: 0; margin-bottom: 20px; }
+
+        /* --- 3. INPUTS --- */
         .input-group {
             margin-bottom: 15px;
             text-align: left;
         }
 
         .input-group label {
-            font-size: 12px;
-            font-weight: bold;
-            color: #555;
+            font-size: 14px;
+            color: #333;
             display: block;
             margin-bottom: 5px;
         }
@@ -53,15 +62,18 @@
         input, select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #555; /* Darker border */
             border-radius: 5px;
             font-size: 14px;
-            box-sizing: border-box; /* Ensures padding doesn't break width */
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #000;
         }
 
-        input:focus {
-            border-color: var(--darker-purple);
+        input:focus, select:focus {
+            border: 2px solid #000; /* Thicker Black Border on Click */
             outline: none;
+            padding: 9px;
         }
 
         /* --- 4. BUTTONS --- */
@@ -69,36 +81,41 @@
             background-color: var(--darker-purple);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 12px 30px;
             width: 100%;
             border-radius: 25px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
+            text-transform: uppercase;
             transition: 0.3s;
-            margin-top: 10px;
+            margin-top: 15px;
+            letter-spacing: 0.5px;
         }
 
-        .btn-primary:hover { background-color: var(--deep-purple); }
+        .btn-primary:hover {
+            background-color: #9932CC;
+            transform: scale(1.02);
+        }
 
         .toggle-link {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 14px;
             color: #666;
+            display: block;
         }
 
         .toggle-link span {
-            color: var(--deep-purple);
+            color: var(--darker-purple);
             font-weight: bold;
             cursor: pointer;
-            text-decoration: underline;
         }
 
-        /* --- 5. HIDE/SHOW LOGIC --- */
-        .hidden { display: none; }
+        .toggle-link span:hover { text-decoration: underline; }
 
-        /* Logo styling */
-        .logo { font-size: 40px; margin-bottom: 10px; display: block;}
+        /* --- 5. UTILS --- */
+        .hidden { display: none; }
+        .logo { font-size: 50px; margin-bottom: 10px; display: block;}
     </style>
 
     <script>
@@ -128,69 +145,62 @@
 
             <form action="login" method="post">
                 <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" name="email" placeholder="ali@student.usm.my" required>
+                    <label>Email:</label>
+                    <input type="email" name="email" placeholder="ali@student.usm.my">
                 </div>
                 <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="••••••••" required>
+                    <label>Password:</label>
+                    <input type="password" name="password">
                 </div>
 
-                <button type="submit" class="btn-primary">LOGIN</button>
-            </form>
+                <button type="submit" class="btn-primary">Login ➜</button>
 
-            <div class="toggle-link">
-                Don't have an account? <span onclick="toggleForms()">Sign Up</span>
-            </div>
+                <div class="toggle-link">
+                    Don't have an account? <span onclick="toggleForms()">Sign Up</span>
+                </div>
+            </form>
         </div>
 
         <div id="signup-section" class="hidden" style="display: none;">
             <p>Create your student account.</p>
 
             <form action="register" method="post">
-
                 <div class="input-group">
-                    <label>Full Name</label>
-                    <input type="text" name="fullName" placeholder="Ali Bin Abu" required>
+                    <label>Full Name:</label>
+                    <input type="text" name="fullName" placeholder="Ali Bin Abu">
                 </div>
 
                 <div class="input-group">
-                    <label>USM Email</label>
-                    <input type="email" name="email" placeholder="ali@student.usm.my" required>
+                    <label>USM Email:</label>
+                    <input type="email" name="email" placeholder="ali@student.usm.my">
                 </div>
 
                 <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
+                    <label>Password:</label>
+                    <input type="password" name="password">
                 </div>
 
                 <div class="input-group">
-                    <label>Phone Number</label>
+                    <label>Phone Number:</label>
                     <input type="text" name="phone" placeholder="012-3456789">
                 </div>
 
                 <div class="input-group">
-                    <label>Dorm / Address</label>
+                    <label>Address:</label>
                     <input type="text" name="address" placeholder="Desasiswa Tekun">
                 </div>
 
                 <div class="input-group">
-                    <label>Major</label>
-                    <select name="major">
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Accounting">Accounting</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Arts">Arts</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <label>Major:</label>
+                    <input type="text" name="major" placeholder="Computer Science">
                 </div>
 
-                <button type="submit" class="btn-primary">CREATE ACCOUNT</button>
-            </form>
+                <button type="submit" class="btn-primary">Register Account</button>
 
-            <div class="toggle-link">
-                Already have an account? <span onclick="toggleForms()">Login</span>
-            </div>
+                <div class="toggle-link">
+                    Already have an account? <span onclick="toggleForms()">Login</span>
+                </div>
+            </form>
         </div>
 
     </div>
